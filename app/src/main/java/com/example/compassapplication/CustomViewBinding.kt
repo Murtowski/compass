@@ -3,10 +3,10 @@ package com.example.compassapplication
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
+import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import timber.log.Timber
+import androidx.databinding.InverseBindingAdapter
+
 
 object CustomViewBinding {
 
@@ -28,5 +28,16 @@ object CustomViewBinding {
 
             this.startAnimation(anim)
         }
+    }
+
+    @BindingAdapter("android:text")
+    @JvmStatic fun TextView.setText(value: Float?) {
+        if (value == null) return
+        this.text = value.toString()
+    }
+
+    @InverseBindingAdapter(attribute = "android:text", event = "android:textAttrChanged")
+    @JvmStatic fun TextView.getTextString(): Float? {
+        return java.lang.Float.valueOf(this.text.toString())
     }
 }

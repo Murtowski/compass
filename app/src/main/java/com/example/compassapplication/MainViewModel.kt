@@ -32,14 +32,15 @@ class MainViewModel(
 
     private var previousAzimuth = 0f
 
-    val ld = sensorUsecase.getAndRegister().asLiveData()
-
-    val azimuth: LiveData<Pair<Float,Float>>  = ld.map {
+    val azimuth: LiveData<Pair<Float,Float>>  = sensorUsecase.getAndRegister().asLiveData().map {
             Timber.d("Receiver new: $it")
             val rotation = Pair(previousAzimuth, it)
             previousAzimuth = it
             rotation
         }
+
+    var longitude = MutableLiveData(0f)
+    var latitude = MutableLiveData(0f)
 
     override fun onCleared() {
         sensorUsecase.stop()

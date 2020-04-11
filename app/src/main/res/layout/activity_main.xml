@@ -14,9 +14,10 @@
         android:background="#FFF">
 
         <TextView
+            android:id="@+id/tv_azimuth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{viewModel.ld.toString()}"
+            android:text="@{viewModel.azimuth.component2().toString()}"
             tools:text="awdawdaw"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -32,6 +33,47 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"/>
+
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_lat"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/til_long"
+            app:layout_constraintTop_toBottomOf="@+id/tv_azimuth"
+            android:layout_marginTop="16dp"
+            android:hint="Latitude"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_lat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@={viewModel.latitude}"
+                />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_long"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/til_lat"
+            app:layout_constraintLeft_toRightOf="@+id/til_lat"
+            app:layout_constraintRight_toRightOf="parent"
+            android:hint="Longitude"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_long"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@={viewModel.longitude}"
+                />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
