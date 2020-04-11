@@ -21,14 +21,19 @@ interface SensorListener{
 interface SensorSource{
     fun registerListenerAndStart(listener: SensorListener)
     fun unregisterListenerAndStop()
+    fun updateSensorManager(manager: SensorManager)
 
 }
 
-class SensorSourceImpl(private val sensorManager: SensorManager):
+class SensorSourceImpl(private var sensorManager: SensorManager):
     SensorSource,
     SensorEventListener{
 
     var listener: SensorListener ?= null
+
+    override fun updateSensorManager(manager: SensorManager) {
+        this.sensorManager = manager
+    }
 
     override fun registerListenerAndStart(listener: SensorListener) {
         this.listener = listener
