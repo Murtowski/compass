@@ -80,7 +80,9 @@ class MainViewModel(
     }
 
     private fun updateDestination(){
-        if(isLatitudeValid.value == true && isLongitudeValid.value == true){
+        if(isLocationPermissionGranted.value == true
+            && isLatitudeValid.value == true
+            && isLongitudeValid.value == true){
             val newDestination = Location("").also {
                 it.latitude = latitude.value!!
                 it.longitude = longitude.value!!
@@ -88,6 +90,11 @@ class MainViewModel(
             sensorUsecase.setLocationOffset(newDestination)
         }
     }
+
+    /*
+    * Location
+    * */
+    val isLocationPermissionGranted = MutableLiveData(false)
 
     override fun onCleared() {
         sensorUsecase.stop()

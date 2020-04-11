@@ -1,19 +1,18 @@
 package com.example.compassapplication
 
-import android.content.Context
-import android.hardware.SensorManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import com.example.compassapplication.databinding.ActivityMainBinding
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.viewModel
-import timber.log.Timber
+import java.util.jar.Manifest
+
 
 class MainActivity : AppCompatActivity() {
+
+    private val REQUEST_CODE_LOCATION = 123
 
     private lateinit var binding: ActivityMainBinding
 
@@ -26,5 +25,27 @@ class MainActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
 
         binding.viewModel = viewModel
+    }
+
+    fun requestPermission(){
+        if(PermissionUtil.isLocationPermissionGranted(this)){
+            viewModel.isLocationPermissionGranted.value = true
+        }else
+            PermissionUtil.justifyAskingForLocationPermission(this){ permissions ->
+                ActivityCompat.requestPermissions(this,
+                    permissions,
+                    REQUEST_CODE_LOCATION);
+            }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String?>,
+        grantResults: IntArray
+    ) {
+        when (requestCode) {
+            REQUEST_CODE_LOCATION -> requestPermission()
+            else -> super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        }
     }
 }
