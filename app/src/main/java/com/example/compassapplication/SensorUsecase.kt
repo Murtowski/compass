@@ -39,7 +39,6 @@ class SensorUsecaseImpl(private val sensorSource: SensorSource,
 
     override fun onSensorData(data: SensorEvent) {
         if (!channel.isClosedForSend) {
-            Timber.d("SensorEvent: $data")
             sensorInterpreter.newData(data)?.let {
                 channel.offer(it)
             }

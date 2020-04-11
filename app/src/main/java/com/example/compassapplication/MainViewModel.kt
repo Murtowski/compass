@@ -19,39 +19,30 @@ import timber.log.Timber
  */
 
 class MainViewModelFactory(
-    private val sensorUsecase: SensorUsecase,
-    private val context: Context
+    private val sensorUsecase: SensorUsecase
 ): ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T = MainViewModel(
-        sensorUsecase,context
+        sensorUsecase
     ) as T
 }
 
 class MainViewModel(
-    private val sensor: SensorUsecase,
-    private val context: Context
+    private val sensorUsecase: SensorUsecase
 ): ViewModel(){
 
     private var previousAzimuth = 0f
-    lateinit var ld : LiveData<Float>
 
-    init {
-        sensor.updateSensorManager(context.getSystemService(Context.SENSOR_SERVICE) as SensorManager)
-        ld = sensor.getAndRegister().asLiveData()
-    }
+    val ld = sensorUsecase.getAndRegister().asLiveData()
 
-
-    val azimuth = MutableLiveData<Pair<Float,Float>>()
-
-//    val azimuth: LiveData<Pair<Float,Float>?>  = Transformations.map(ld) {
-//            Timber.d("Receiver new: $it")
-//            val rotation = Pair(previousAzimuth, it)
-//            previousAzimuth = it
-//            rotation
-//        }
+    val azimuth: LiveData<Pair<Float,Float>>  = ld.map {
+            Timber.d("Receiver new: $it")
+            val rotation = Pair(previousAzimuth, it)
+            previousAzimuth = it
+            rotation
+        }
 
     override fun onCleared() {
-        sensor.stop()
+        sensorUsecase.stop()
         super.onCleared()
     }
 }
