@@ -4,9 +4,11 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
 import com.example.compassapplication.databinding.ActivityMainBinding
 import org.koin.android.ext.android.inject
+import timber.log.Timber
 import java.util.jar.Manifest
 
 
@@ -25,17 +27,26 @@ class MainActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
 
         binding.viewModel = viewModel
+
+        binding.vPermission.setOnClickListener {
+            requestPermission()
+        }
     }
 
-    fun requestPermission(){
+    private fun requestPermission(){
         if(PermissionUtil.isLocationPermissionGranted(this)){
+            Timber.d("Permissions Granted")
             viewModel.isLocationPermissionGranted.value = true
-        }else
-            PermissionUtil.justifyAskingForLocationPermission(this){ permissions ->
-                ActivityCompat.requestPermissions(this,
+        }else {
+            viewModel.isLocationPermissionGranted.value = false
+            PermissionUtil.justifyAskingForLocationPermission(this) { permissions ->
+                ActivityCompat.requestPermissions(
+                    this,
                     permissions,
-                    REQUEST_CODE_LOCATION);
+                    REQUEST_CODE_LOCATION
+                );
             }
+        }
     }
 
     override fun onRequestPermissionsResult(

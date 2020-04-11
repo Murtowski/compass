@@ -94,7 +94,7 @@ class MainViewModel(
     /*
     * Location
     * */
-    val isLocationPermissionGranted = MutableLiveData(false)
+    val isLocationPermissionGranted = MutableLiveData<Boolean?>(null)
 
     override fun onCleared() {
         sensorUsecase.stop()

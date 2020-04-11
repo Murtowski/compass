@@ -45,4 +45,16 @@ object CustomViewBinding {
             null
         }
     }
+
+    @BindingAdapter("permissionState")
+    @JvmStatic fun TextView.changeEnableStatus(permissionGranted: Boolean?) {
+        isEnabled = permissionGranted ?: true
+    }
+
+    @BindingAdapter("permissionVisibility")
+    @JvmStatic fun View.changeVisibility(permissionGranted: Boolean?){
+        if(permissionGranted == null ) visibility = View.VISIBLE
+        else if(permissionGranted) visibility = View.GONE
+        else visibility = View.VISIBLE
+    }
 }

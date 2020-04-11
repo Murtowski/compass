@@ -12,7 +12,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#FFF">
+        android:background="#FFF"
+        android:padding="16dp">
 
         <TextView
             android:id="@+id/tv_azimuth"
@@ -24,29 +25,84 @@
             app:layout_constraintLeft_toLeftOf="parent"
             />
 
-        <ImageView
-            android:id="@+id/iv_compass_image"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/compass_container"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/compass"
-            animatedRotation="@{viewModel.azimuth}"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"/>
+            app:layout_constraintRight_toRightOf="parent"
+            animatedRotation="@{viewModel.azimuth}"
+            >
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="N"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/iv_compass_image"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="S"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@+id/iv_compass_image"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="W"
+                android:textStyle="bold"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/iv_compass_image"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="E"
+                android:textStyle="bold"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@+id/iv_compass_image"
+                />
+
+            <ImageView
+                android:id="@+id/iv_compass_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_navigation_black_24dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/til_lat"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:hint="Latitude"
+            app:errorEnabled="@{!viewModel.isLatitudeValid()}"
+            app:helperText="Range from -180 to 180"
+            app:helperTextEnabled="true"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/til_long"
             app:layout_constraintTop_toBottomOf="@+id/tv_azimuth"
             android:layout_marginTop="16dp"
-            android:hint="Latitude"
-            app:errorEnabled="@{!viewModel.isLatitudeValid()}"
+            android:layout_marginRight="8dp"
             >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -55,6 +111,7 @@
                 android:layout_height="wrap_content"
                 android:text="@={viewModel.latitude}"
                 app:error="@{viewModel.latitudeError.msg}"
+                permissionState="@{viewModel.isLocationPermissionGranted}"
                 android:inputType="numberDecimal"
                 android:maxLength="10"
                 />
@@ -65,11 +122,15 @@
             android:id="@+id/til_long"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:hint="Longitude"
+            app:errorEnabled="@{!viewModel.isLongitudeValid()}"
+            app:helperText="Range from -90 to 90"
+            app:helperTextEnabled="true"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             app:layout_constraintTop_toTopOf="@+id/til_lat"
             app:layout_constraintLeft_toRightOf="@+id/til_lat"
             app:layout_constraintRight_toRightOf="parent"
-            android:hint="Longitude"
-            app:errorEnabled="@{!viewModel.isLongitudeValid()}"
+            android:layout_marginLeft="8dp"
             >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -78,12 +139,22 @@
                 android:layout_height="wrap_content"
                 android:text="@={viewModel.longitude}"
                 app:error="@{viewModel.longitudeError.msg}"
+                permissionState="@{viewModel.isLocationPermissionGranted}"
                 android:inputType="numberDecimal"
                 android:maxLength="10"
                 />
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <View
+            android:id="@+id/v_permission"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            permissionVisibility="@{viewModel.isLocationPermissionGranted}"
+            app:layout_constraintLeft_toLeftOf="@+id/til_lat"
+            app:layout_constraintTop_toTopOf="@+id/til_lat"
+            app:layout_constraintBottom_toBottomOf="@+id/til_lat"
+            app:layout_constraintRight_toRightOf="@id/til_long"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

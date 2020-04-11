@@ -29,13 +29,13 @@ class CompassApplication: Application() {
 
     val myModule : Module = module {
 
-        factory{applicationContext.getSystemService(Context.SENSOR_SERVICE) as SensorManager}
+        factory{ applicationContext.getSystemService(Context.SENSOR_SERVICE) as SensorManager }
         factory<SensorSource> { SensorSourceImpl(get()) }
         factory<SensorInterpreter>{SensorInterpreterImpl(get())}
         single<SensorUsecase> { (SensorUsecaseImpl(get(), get())) }
 
-        factory { applicationContext.getSystemService(Context.LOCATION_SERVICE) }
-        single<LocationUsecase>{LocationUsecaseImpl(get())}
+        factory { applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager }
+        single<LocationUsecase>{ LocationUsecaseImpl(get()) }
 
         factory { MainViewModelFactory(get(),get()) }
         viewModel { MainViewModel(get(),get()) }
