@@ -63,14 +63,14 @@ class SensorSourceImpl(private val sensorManager: SensorManager):
     }
 }
 
+
+const val alpha = 0.97f
+
 interface SensorInterpreter {
     fun newData(data: SensorEvent): Float?
 }
 
-const val alpha = 0.97f
-
 class SensorInterpreterImpl(private val sensorManager: SensorManager): SensorInterpreter{
-
 
     val gravity = floatArrayOf(0f,0f,0f)
     val magnetic = floatArrayOf(0f,0f,0f)

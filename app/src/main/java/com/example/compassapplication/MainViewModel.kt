@@ -1,8 +1,8 @@
 package com.example.compassapplication
 
+import android.app.Application
 import android.hardware.SensorEvent
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.launch
 
@@ -11,26 +11,23 @@ import kotlinx.coroutines.launch
  * @author Piotr Piskorski
  * @date on 02.04.2020.
  */
-class MainViewModel(private val sensorSource: SensorSource,
-                    private val sensorInterpreter: SensorInterpreter): ViewModel(), SensorListener{
-    // only the the most recently sent value is received, while previously sent elements are lost
-    val channel = ConflatedBroadcastChannel<SensorEvent>()
 
-    init {
-        sensorSource.registerListenerAndStart(this)
-    }
+class DiscoverDivicesViewModelFactory(
+    private val sensorUsecase: SensorUsecase
+): ViewModelProvider.NewInstanceFactory() {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T = MainViewModel(
+        sensorUsecase
+    ) as T
+}
 
-    override fun onSensorData(data: SensorEvent) {
-        viewModelScope.launch {
-            channel.send(data)
-        }
+class MainViewModel(private val sensor: SensorUsecase): ViewModel(){
 
-        sensorInterpreter.newData(data)
+    val azimuth: LiveData<Float> by lazy {
+        sensor.getAndRegister().asLiveData()
     }
 
     override fun onCleared() {
+        sensor.stop()
         super.onCleared()
-        sensorSource.unregisterListenerAndStop()
-        channel.close()
     }
 }
