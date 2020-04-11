@@ -5,6 +5,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.location.Location
+import timber.log.Timber
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -23,7 +24,6 @@ interface SensorListener{
 interface SensorSource{
     fun registerListenerAndStart(listener: SensorListener)
     fun unregisterListenerAndStop()
-    fun updateSensorManager(manager: SensorManager)
 
 }
 
@@ -32,10 +32,6 @@ class SensorSourceImpl(private var sensorManager: SensorManager):
     SensorEventListener{
 
     var listener: SensorListener ?= null
-
-    override fun updateSensorManager(manager: SensorManager) {
-        this.sensorManager = manager
-    }
 
     override fun registerListenerAndStart(listener: SensorListener) {
         this.listener = listener
@@ -90,6 +86,7 @@ class SensorInterpreterImpl(private val sensorManager: SensorManager): SensorInt
             currentLocation.latitude, currentLocation.longitude,
             destinationLocation.latitude, destinationLocation.longitude
         )
+        Timber.d("New Location offet counted: $offsetAngle")
     }
 
     fun calculateBearingAngle(

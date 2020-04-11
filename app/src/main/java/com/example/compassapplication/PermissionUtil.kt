@@ -10,6 +10,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 object PermissionUtil {
 
     const val LOCATION_PERMISSION = Manifest.permission.ACCESS_COARSE_LOCATION
+    const val LOCATION_PERMISSION_FINE = Manifest.permission.ACCESS_FINE_LOCATION
 
     fun isPermissionGranted(context: Context, permission: String): Boolean{
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -20,7 +21,7 @@ object PermissionUtil {
     }
 
     fun isLocationPermissionGranted(context: Context): Boolean{
-        return isPermissionGranted(context, LOCATION_PERMISSION)
+        return isPermissionGranted(context, LOCATION_PERMISSION) && isPermissionGranted(context, LOCATION_PERMISSION_FINE)
     }
 
     fun justifyAskingForPermission(permissionsArray: Array<String>,
@@ -44,6 +45,6 @@ object PermissionUtil {
     }
 
     fun justifyAskingForLocationPermission(activity: Activity, requestPermission: (permissions: Array<String>) -> Unit){
-        justifyAskingForPermission(arrayOf(LOCATION_PERMISSION), activity, requestPermission)
+        justifyAskingForPermission(arrayOf(LOCATION_PERMISSION, LOCATION_PERMISSION_FINE), activity, requestPermission)
     }
 }

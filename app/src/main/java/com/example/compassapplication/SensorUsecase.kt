@@ -9,7 +9,7 @@ import timber.log.Timber
 
 interface SensorUsecase {
     fun getAndRegister(): Flow<Float>
-    fun setLocationOffset(location: Location)
+    fun setLocationOffset(currentLocation: Location, destinationLocation: Location)
     fun stop()
 
 
@@ -22,12 +22,8 @@ internal class SensorUsecaseImpl(private val sensorSource: SensorSource,
     // only the the most recently sent value is received, while previously sent elements are lost
     private val channel = ConflatedBroadcastChannel<Float>()
 
-    override fun setLocationOffset(location: Location) {
-        val current = Location("").apply {
-            latitude = 0.0
-            longitude = 0.0
-        }
-        sensorInterpreter.addLocationAngle(current, location)
+    override fun setLocationOffset(currentLocation: Location, destinationLocation: Location){
+        sensorInterpreter.addLocationAngle(currentLocation, destinationLocation)
     }
 
     override fun getAndRegister(): Flow<Float> {
