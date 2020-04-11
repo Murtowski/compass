@@ -31,13 +31,18 @@ object CustomViewBinding {
     }
 
     @BindingAdapter("android:text")
-    @JvmStatic fun TextView.setText(value: Float?) {
-        if (value == null) return
+    @JvmStatic fun TextView.setText(value: Double?) {
+        if (value == null ) return
+        if (value == this.getTextString()) return
         this.text = value.toString()
     }
 
     @InverseBindingAdapter(attribute = "android:text", event = "android:textAttrChanged")
-    @JvmStatic fun TextView.getTextString(): Float? {
-        return java.lang.Float.valueOf(this.text.toString())
+    @JvmStatic fun TextView.getTextString(): Double? {
+        return try {
+            this.text.toString().toDouble()
+        }catch (e: NumberFormatException){
+            null
+        }
     }
 }

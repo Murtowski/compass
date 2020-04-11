@@ -1,30 +1,33 @@
 package com.example.compassapplication
 
 import android.hardware.SensorEvent
-import android.hardware.SensorManager
+import android.location.Location
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flow
 import timber.log.Timber
 
 interface SensorUsecase {
     fun getAndRegister(): Flow<Float>
-    fun stop()fun updateSensorManager(manager: SensorManager)
+    fun setLocationOffset(location: Location)
+    fun stop()
 
 
 }
 
-class SensorUsecaseImpl(private val sensorSource: SensorSource,
+internal class SensorUsecaseImpl(private val sensorSource: SensorSource,
                         private val sensorInterpreter: SensorInterpreter
 ): SensorUsecase, SensorListener{
 
     // only the the most recently sent value is received, while previously sent elements are lost
     private val channel = ConflatedBroadcastChannel<Float>()
-    private val startAzimuth = 0f
 
-    override fun updateSensorManager(manager: SensorManager){
-        this.sensorSource.updateSensorManager(manager)
+    override fun setLocationOffset(location: Location) {
+        val current = Location("").apply {
+            latitude = 0.0
+            longitude = 0.0
+        }
+        sensorInterpreter.addLocationAngle(current, location)
     }
 
     override fun getAndRegister(): Flow<Float> {
@@ -39,7 +42,7 @@ class SensorUsecaseImpl(private val sensorSource: SensorSource,
 
     override fun onSensorData(data: SensorEvent) {
         if (!channel.isClosedForSend) {
-            sensorInterpreter.newData(data)?.let {
+            sensorInterpreter.calculateNorthAngle(data)?.let {
                 channel.offer(it)
             }
         }

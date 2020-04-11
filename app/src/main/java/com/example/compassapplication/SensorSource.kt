@@ -1,11 +1,13 @@
 package com.example.compassapplication
 
-import android.content.Context
-import android.content.Context.SENSOR_SERVICE
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.location.Location
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
 /**
  * Created by
@@ -72,7 +74,8 @@ class SensorSourceImpl(private var sensorManager: SensorManager):
 const val alpha = 0.97f
 
 interface SensorInterpreter {
-    fun newData(data: SensorEvent): Float?
+    fun calculateNorthAngle(data: SensorEvent): Float?
+    fun addLocationAngle(currentLocation: Location, destinationLocation: Location)
 }
 
 class SensorInterpreterImpl(private val sensorManager: SensorManager): SensorInterpreter{
@@ -80,7 +83,32 @@ class SensorInterpreterImpl(private val sensorManager: SensorManager): SensorInt
     val gravity = floatArrayOf(0f,0f,0f)
     val magnetic = floatArrayOf(0f,0f,0f)
 
-    override fun newData(data: SensorEvent): Float? {
+    var offsetAngle = 0f
+
+    override fun addLocationAngle(currentLocation: Location, destinationLocation: Location) {
+        offsetAngle = calculateBearingAngle(
+            currentLocation.latitude, currentLocation.longitude,
+            destinationLocation.latitude, destinationLocation.longitude
+        )
+    }
+
+    fun calculateBearingAngle(
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
+    ): Float {
+        val Phi1 = Math.toRadians(lat1)
+        val Phi2 = Math.toRadians(lat2)
+        val DeltaLambda = Math.toRadians(lon2 - lon1)
+        val Theta: Double = atan2(
+            sin(DeltaLambda) * cos(Phi2),
+            cos(Phi1) * sin(Phi2) - sin(Phi1) * cos(Phi2) * cos(DeltaLambda)
+        )
+        return Math.toDegrees(Theta).toFloat()
+    }
+
+    override fun calculateNorthAngle(data: SensorEvent): Float? {
         if(data.isAccelerometer()){
             for(i in 0..2){
                 gravity[i] = alpha * gravity[i] + (1- alpha) * data.values[i]
@@ -100,7 +128,7 @@ class SensorInterpreterImpl(private val sensorManager: SensorManager): SensorInt
             val orientation = floatArrayOf(0f,0f,0f)
             SensorManager.getOrientation(R, orientation)
             val azimuth = Math.toDegrees(orientation[0].toDouble())
-            return azimuth.toFloat()
+            return azimuth.toFloat() - offsetAngle
         }else
             return null
 

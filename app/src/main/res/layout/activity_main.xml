@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
+        <import type="com.example.compassapplication.InputError"/>
         <variable
             name="viewModel"
             type="com.example.compassapplication.MainViewModel" />
@@ -45,6 +46,7 @@
             app:layout_constraintTop_toBottomOf="@+id/tv_azimuth"
             android:layout_marginTop="16dp"
             android:hint="Latitude"
+            app:errorEnabled="@{!viewModel.isLatitudeValid()}"
             >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -52,6 +54,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@={viewModel.latitude}"
+                app:error="@{viewModel.latitudeError.msg}"
+                android:inputType="numberDecimal"
+                android:maxLength="10"
                 />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -64,6 +69,7 @@
             app:layout_constraintLeft_toRightOf="@+id/til_lat"
             app:layout_constraintRight_toRightOf="parent"
             android:hint="Longitude"
+            app:errorEnabled="@{!viewModel.isLongitudeValid()}"
             >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -71,6 +77,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@={viewModel.longitude}"
+                app:error="@{viewModel.longitudeError.msg}"
+                android:inputType="numberDecimal"
+                android:maxLength="10"
                 />
 
         </com.google.android.material.textfield.TextInputLayout>
