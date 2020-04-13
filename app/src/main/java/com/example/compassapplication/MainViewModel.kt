@@ -32,7 +32,6 @@ class MainViewModel(
     * */
     private var previousAzimuth = 0f
     val azimuth: LiveData<Pair<Float,Float>>  = sensorUsecase.getAndRegister().asLiveData().map {
-//            Timber.d("Receiver new: $it")
             val rotation = Pair(previousAzimuth, it)
             previousAzimuth = it
             rotation
@@ -41,7 +40,13 @@ class MainViewModel(
     /*
     * LONGITUDE
     * */
-    private val longitude = MutableLiveData<Double?>(0.0)
+    val longitude = object: MutableLiveData<Double?>(0.0){
+        override fun setValue(value: Double?) {
+            super.setValue(value)
+            Timber.d("Updating longitude")
+            updateDestination()
+        }
+    }
     val longitudeError : LiveData<InputError> = longitude.map {
         when{
             it == null -> InputError.INVALID_FORMAT
@@ -56,13 +61,13 @@ class MainViewModel(
     /*
     * LATITUDE
     * */
-    val latitude = MutableLiveData<Double?>(0.0)
-//    val _latitude = MediatorLiveData<Double?>().apply {
-//        addSource(latitude){
-//            Timber.d("Latitude change detected")
-//            updateDestination()
-//        }
-//    }
+    val latitude = object: MutableLiveData<Double?>(0.0){
+        override fun setValue(value: Double?) {
+            super.setValue(value)
+            Timber.d("Updating latitude")
+            updateDestination()
+        }
+    }
     val latitudeError : LiveData<InputError> = latitude.map {
         Timber.d("Edit Lat:$it")
         when{
@@ -100,21 +105,13 @@ class MainViewModel(
     /*
     * Location
     * */
-    val isLocationPermissionGranted = MutableLiveData<Boolean?>(null)
 
     var currentLocation : Location ?= null
-
-    init {
-        longitude.observeForever{
-            updateDestination()
-        }
-//        latitude.observeForever{
-//            updateDestination()
-//        }
-
-        isLocationPermissionGranted.observeForever{ permissionGranted ->
+    val isLocationPermissionGranted = object :MutableLiveData<Boolean?>(null){
+        override fun setValue(permissionGranted: Boolean?) {
+            super.setValue(permissionGranted)
+            Timber.d("Location permission changed: $permissionGranted")
             if(permissionGranted == true){
-                Timber.d("Permission Granted now we can listen location")
                 viewModelScope.launch {
                     locationUsecase.getAndListenLocation().collect {
                         currentLocation = it
@@ -125,6 +122,9 @@ class MainViewModel(
         }
     }
 
+    /*
+    * Clear
+    * */
     override fun onCleared() {
         sensorUsecase.stop()
         locationUsecase.stop()
