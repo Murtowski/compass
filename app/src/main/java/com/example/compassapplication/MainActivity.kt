@@ -31,6 +31,11 @@ class MainActivity : AppCompatActivity() {
         binding.vPermission.setOnClickListener {
             requestPermission()
         }
+        checkPermission()
+    }
+
+    private fun checkPermission(){
+        viewModel.isLocationPermissionGranted.value = PermissionUtil.isLocationPermissionGranted(this)
     }
 
     private fun requestPermission(){
