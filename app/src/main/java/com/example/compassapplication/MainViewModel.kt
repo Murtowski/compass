@@ -41,7 +41,7 @@ class MainViewModel(
     /*
     * LONGITUDE
     * */
-    val longitude = MutableLiveData<Double?>(0.0)
+    private val longitude = MutableLiveData<Double?>(0.0)
     val longitudeError : LiveData<InputError> = longitude.map {
         when{
             it == null -> InputError.INVALID_FORMAT
@@ -57,6 +57,12 @@ class MainViewModel(
     * LATITUDE
     * */
     val latitude = MutableLiveData<Double?>(0.0)
+//    val _latitude = MediatorLiveData<Double?>().apply {
+//        addSource(latitude){
+//            Timber.d("Latitude change detected")
+//            updateDestination()
+//        }
+//    }
     val latitudeError : LiveData<InputError> = latitude.map {
         Timber.d("Edit Lat:$it")
         when{
@@ -102,9 +108,9 @@ class MainViewModel(
         longitude.observeForever{
             updateDestination()
         }
-        latitude.observeForever{
-            updateDestination()
-        }
+//        latitude.observeForever{
+//            updateDestination()
+//        }
 
         isLocationPermissionGranted.observeForever{ permissionGranted ->
             if(permissionGranted == true){
