@@ -47,9 +47,9 @@ object CustomViewBinding {
         }
     }
 
-    @BindingAdapter("permissionState")
-    @JvmStatic fun TextView.changeEnableStatus(permissionGranted: Boolean?) {
-        isEnabled = permissionGranted ?: true
+    @BindingAdapter("permissionGranted", "locationFound")
+    @JvmStatic fun View.changeEnableStatus(permissionGranted: Boolean?, locationFound: Location?) {
+        isEnabled = (permissionGranted ?: true) && locationFound != null
     }
 
     @BindingAdapter("permissionVisibility")
@@ -71,10 +71,5 @@ object CustomViewBinding {
     @JvmStatic fun TextView.setCurrentLocation(location: Location?){
         if(location == null) text = "Searching..."
         else text = "${location.latitude} / ${location.longitude}"
-    }
-
-    @BindingAdapter("enableWhenLocationNotNull")
-    @JvmStatic fun View.enable(location: Location?){
-        isEnabled = location != null
     }
 }

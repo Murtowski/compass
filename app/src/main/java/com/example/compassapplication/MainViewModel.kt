@@ -85,8 +85,6 @@ class MainViewModel(
     * */
     private fun updateDestination(){
         viewModelScope.launch {
-            delay(500)
-
             val currentLoc = _currentLocation.value
             val lat = if(isLatitudeValid.value == true) latitude.value else null
             val lng = if(isLongitudeValid.value == true) longitude.value else null

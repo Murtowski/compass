@@ -87,10 +87,10 @@
                 android:layout_height="wrap_content"
                 android:text="@={viewModel.latitude}"
                 app:error="@{viewModel.latitudeError.msg}"
-                permissionState="@{viewModel.isLocationPermissionGranted}"
+                permissionGranted="@{viewModel.isLocationPermissionGranted}"
+                locationFound="@{viewModel.currentLocation}"
                 android:inputType="numberDecimal"
                 android:maxLength="10"
-                enableWhenLocationNotNull="@{viewModel.currentLocation}"
                 />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -117,23 +117,23 @@
                 android:layout_height="wrap_content"
                 android:text="@={viewModel.longitude}"
                 app:error="@{viewModel.longitudeError.msg}"
-                permissionState="@{viewModel.isLocationPermissionGranted}"
+                permissionGranted="@{viewModel.isLocationPermissionGranted}"
+                locationFound="@{viewModel.currentLocation}"
                 android:inputType="numberDecimal"
                 android:maxLength="10"
-                enableWhenLocationNotNull="@{viewModel.currentLocation}"
                 />
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <View
-            android:id="@+id/v_permission"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            permissionVisibility="@{viewModel.isLocationPermissionGranted}"
-            app:layout_constraintLeft_toLeftOf="@+id/til_lat"
-            app:layout_constraintTop_toTopOf="@+id/til_lat"
-            app:layout_constraintBottom_toBottomOf="@+id/til_lat"
-            app:layout_constraintRight_toRightOf="@id/til_long"/>
+<!--        <View-->
+<!--            android:id="@+id/v_permission"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="0dp"-->
+<!--            permissionVisibility="@{viewModel.isLocationPermissionGranted}"-->
+<!--            app:layout_constraintLeft_toLeftOf="@+id/til_lat"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/til_lat"-->
+<!--            app:layout_constraintBottom_toBottomOf="@+id/til_lat"-->
+<!--            app:layout_constraintRight_toRightOf="@id/til_long"/>-->
 
         <HorizontalScrollView
             android:id="@+id/sv_places"
@@ -153,7 +153,8 @@
                     android:layout_height="wrap_content"
                     android:text="Wroclaw"
                     android:onClick="@{()-> viewModel.setWroclaw()}"
-                    enableWhenLocationNotNull="@{viewModel.currentLocation}"
+                    permissionGranted="@{viewModel.isLocationPermissionGranted}"
+                    locationFound="@{viewModel.currentLocation}"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     />
 
@@ -162,7 +163,8 @@
                     android:layout_height="wrap_content"
                     android:text="MountEverest"
                     android:onClick="@{()-> viewModel.setMountEverest()}"
-                    enableWhenLocationNotNull="@{viewModel.currentLocation}"
+                    permissionGranted="@{viewModel.isLocationPermissionGranted}"
+                    locationFound="@{viewModel.currentLocation}"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_marginLeft="16dp"
                     />
@@ -172,7 +174,8 @@
                     android:layout_height="wrap_content"
                     android:text="Prague"
                     android:onClick="@{()-> viewModel.setPraga()}"
-                    enableWhenLocationNotNull="@{viewModel.currentLocation}"
+                    permissionGranted="@{viewModel.isLocationPermissionGranted}"
+                    locationFound="@{viewModel.currentLocation}"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_marginLeft="16dp"
                     />
@@ -182,7 +185,8 @@
                     android:layout_height="wrap_content"
                     android:text="Los Angeles"
                     android:onClick="@{()-> viewModel.setLosAngeles()}"
-                    enableWhenLocationNotNull="@{viewModel.currentLocation}"
+                    permissionGranted="@{viewModel.isLocationPermissionGranted}"
+                    locationFound="@{viewModel.currentLocation}"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_marginLeft="16dp"
                     />

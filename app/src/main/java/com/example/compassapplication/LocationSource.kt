@@ -27,8 +27,12 @@ class LocationSourceImpl(
         this.listener = listener
 
         try {
-            onLocationChanged(locationManager.getLastKnownLocation(""))
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000,
+            fusedLocationProviderClient.lastLocation
+                .addOnSuccessListener() { location : Location? ->
+                    Timber.d("Fused got last location")
+                    onLocationChanged(location)
+                }
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000,
                 10f, this)
         }catch (e: SecurityException){
             throw e // allow to crash
