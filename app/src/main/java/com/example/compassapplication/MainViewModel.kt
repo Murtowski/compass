@@ -81,32 +81,47 @@ class MainViewModel(
     }
 
     /*
-    * LATITUDE & LONGITUDE validation > automatic update destination
+    * LATITUDE & LONGITUDE update destination
     * */
     private fun updateDestination(){
-        Timber.d("Try to update dest")
         viewModelScope.launch {
             delay(500)
+
+            val currentLoc = _currentLocation.value
+            val lat = if(isLatitudeValid.value == true) latitude.value else null
+            val lng = if(isLongitudeValid.value == true) longitude.value else null
+
             if(isLocationPermissionGranted.value == true
-                && currentLocation != null
-                && isLatitudeValid.value == true
-                && isLongitudeValid.value == true){
+                && currentLoc != null && lat != null && lng != null ) {
+
                 Timber.d("Update destination")
+                _isCustomAzimuthSet.postValue(true)
+
                 val newDestination = Location("").also {
-                    it.latitude = latitude.value!!
-                    it.longitude = longitude.value!!
+                    it.latitude = lat
+                    it.longitude = lng
                 }
-                sensorUsecase.setLocationOffset(currentLocation!!, newDestination)
+                sensorUsecase.setLocationOffset(currentLoc, newDestination)
             }
         }
+    }
 
+    private val _isCustomAzimuthSet = MutableLiveData(false)
+    val isCustomAzimuthSet = _isCustomAzimuthSet
+
+    fun resetCustomAzimuth(){
+//        latitude.value = currentLocation?.latitude
+//        longitude.value = currentLocation?.longitude
+        _isCustomAzimuthSet.value = false
+        sensorUsecase.clearLocationOffset()
     }
 
     /*
     * Location
     * */
+    private val _currentLocation = MutableLiveData<Location?>(null)
+    val currentLocation : LiveData<Location?> = _currentLocation
 
-    var currentLocation : Location ?= null
     val isLocationPermissionGranted = object :MutableLiveData<Boolean?>(null){
         override fun setValue(permissionGranted: Boolean?) {
             super.setValue(permissionGranted)
@@ -114,12 +129,32 @@ class MainViewModel(
             if(permissionGranted == true){
                 viewModelScope.launch {
                     locationUsecase.getAndListenLocation().collect {
-                        currentLocation = it
+                        _currentLocation.postValue(it)
                     }
                 }
 
             }
         }
+    }
+
+    fun setWroclaw(){
+        latitude.value = 51.107883
+        longitude.value = 17.038538
+    }
+
+    fun setMountEverest(){
+        latitude.value = 27.986065
+        longitude.value = 86.922623
+    }
+
+    fun setPraga(){
+        latitude.value = 50.073658
+        longitude.value = 14.418540
+    }
+
+    fun setLosAngeles(){
+        latitude.value = 34.052235
+        longitude.value = -118.243683
     }
 
     /*

@@ -72,6 +72,7 @@ const val alpha = 0.97f
 interface SensorInterpreter {
     fun calculateNorthAngle(data: SensorEvent): Float?
     fun addLocationAngle(currentLocation: Location, destinationLocation: Location)
+    fun clearLocationAngle()
 }
 
 class SensorInterpreterImpl(private val sensorManager: SensorManager): SensorInterpreter{
@@ -80,6 +81,10 @@ class SensorInterpreterImpl(private val sensorManager: SensorManager): SensorInt
     val magnetic = floatArrayOf(0f,0f,0f)
 
     var offsetAngle = 0f
+
+    override fun clearLocationAngle() {
+        offsetAngle = 0f
+    }
 
     override fun addLocationAngle(currentLocation: Location, destinationLocation: Location) {
         offsetAngle = calculateBearingAngle(

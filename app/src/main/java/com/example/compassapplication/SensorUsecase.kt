@@ -10,6 +10,7 @@ import timber.log.Timber
 interface SensorUsecase {
     fun getAndRegister(): Flow<Float>
     fun setLocationOffset(currentLocation: Location, destinationLocation: Location)
+    fun clearLocationOffset()
     fun stop()
 
 
@@ -24,6 +25,10 @@ internal class SensorUsecaseImpl(private val sensorSource: SensorSource,
 
     override fun setLocationOffset(currentLocation: Location, destinationLocation: Location){
         sensorInterpreter.addLocationAngle(currentLocation, destinationLocation)
+    }
+
+    override fun clearLocationOffset() {
+        sensorInterpreter.clearLocationAngle()
     }
 
     override fun getAndRegister(): Flow<Float> {

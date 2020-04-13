@@ -1,5 +1,6 @@
 package com.example.compassapplication
 
+import android.location.Location
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
@@ -56,5 +57,24 @@ object CustomViewBinding {
         if(permissionGranted == null ) visibility = View.VISIBLE
         else if(permissionGranted) visibility = View.GONE
         else visibility = View.VISIBLE
+    }
+
+    @BindingAdapter("visible")
+    @JvmStatic fun View.visible(visibile: Boolean){
+        if(visibile)
+            visibility = View.VISIBLE
+        else
+            visibility = View.INVISIBLE
+    }
+
+    @BindingAdapter("currentLocation")
+    @JvmStatic fun TextView.setCurrentLocation(location: Location?){
+        if(location == null) text = "Searching..."
+        else text = "${location.latitude} / ${location.longitude}"
+    }
+
+    @BindingAdapter("enableWhenLocationNotNull")
+    @JvmStatic fun View.enable(location: Location?){
+        isEnabled = location != null
     }
 }

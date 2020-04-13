@@ -16,78 +16,54 @@
         android:padding="16dp">
 
         <TextView
+            android:id="@+id/tv_azimuth_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Azimuth [°]: "
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"/>
+
+        <TextView
             android:id="@+id/tv_azimuth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{viewModel.azimuth.component2().toString()}"
-            tools:text="awdawdaw"
-            app:layout_constraintTop_toTopOf="parent"
+            tools:text="23.523523"
+            app:layout_constraintTop_toTopOf="@+id/tv_azimuth_label"
+            app:layout_constraintLeft_toRightOf="@+id/tv_azimuth_label"
+            android:layout_marginLeft="4dp"
+            />
+
+        <TextView
+            android:id="@+id/tv_current_location_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Current location:"
+            app:layout_constraintTop_toBottomOf="@+id/tv_azimuth_label"
             app:layout_constraintLeft_toLeftOf="parent"
             />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/compass_container"
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
+            currentLocation="@{viewModel.currentLocation}"
+            app:layout_constraintLeft_toRightOf="@+id/tv_current_location_label"
+            app:layout_constraintTop_toTopOf="@id/tv_current_location_label"
+            android:layout_marginLeft="4dp"
+            />
+
+        <Button
+            android:id="@+id/btn_reset_destination"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reset"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:onClick="@{() -> viewModel.resetCustomAzimuth()}"
+            android:enabled="@{viewModel.isCustomAzimuthSet}"
+            app:layout_constraintTop_toTopOf="@+id/til_lat"
             app:layout_constraintRight_toRightOf="parent"
-            animatedRotation="@{viewModel.azimuth}"
-            >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="N"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@+id/iv_compass_image"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="S"
-                android:textStyle="bold"
-                app:layout_constraintTop_toBottomOf="@+id/iv_compass_image"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="W"
-                android:textStyle="bold"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintRight_toLeftOf="@+id/iv_compass_image"
-                />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="E"
-                android:textStyle="bold"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toRightOf="@+id/iv_compass_image"
-                />
-
-            <ImageView
-                android:id="@+id/iv_compass_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_navigation_black_24dp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_marginTop="8dp"
+            />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/til_lat"
@@ -100,7 +76,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/til_long"
-            app:layout_constraintTop_toBottomOf="@+id/tv_azimuth"
+            app:layout_constraintTop_toBottomOf="@+id/tv_current_location_label"
             android:layout_marginTop="16dp"
             android:layout_marginRight="8dp"
             >
@@ -114,6 +90,7 @@
                 permissionState="@{viewModel.isLocationPermissionGranted}"
                 android:inputType="numberDecimal"
                 android:maxLength="10"
+                enableWhenLocationNotNull="@{viewModel.currentLocation}"
                 />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -129,8 +106,9 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             app:layout_constraintTop_toTopOf="@+id/til_lat"
             app:layout_constraintLeft_toRightOf="@+id/til_lat"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/btn_reset_destination"
             android:layout_marginLeft="8dp"
+            android:layout_marginRight="16dp"
             >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -142,6 +120,7 @@
                 permissionState="@{viewModel.isLocationPermissionGranted}"
                 android:inputType="numberDecimal"
                 android:maxLength="10"
+                enableWhenLocationNotNull="@{viewModel.currentLocation}"
                 />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -155,6 +134,141 @@
             app:layout_constraintTop_toTopOf="@+id/til_lat"
             app:layout_constraintBottom_toBottomOf="@+id/til_lat"
             app:layout_constraintRight_toRightOf="@id/til_long"/>
+
+        <HorizontalScrollView
+            android:id="@+id/sv_places"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/til_lat"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginTop="24dp"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Wroclaw"
+                    android:onClick="@{()-> viewModel.setWroclaw()}"
+                    enableWhenLocationNotNull="@{viewModel.currentLocation}"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="MountEverest"
+                    android:onClick="@{()-> viewModel.setMountEverest()}"
+                    enableWhenLocationNotNull="@{viewModel.currentLocation}"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_marginLeft="16dp"
+                    />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Prague"
+                    android:onClick="@{()-> viewModel.setPraga()}"
+                    enableWhenLocationNotNull="@{viewModel.currentLocation}"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_marginLeft="16dp"
+                    />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Los Angeles"
+                    android:onClick="@{()-> viewModel.setLosAngeles()}"
+                    enableWhenLocationNotNull="@{viewModel.currentLocation}"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_marginLeft="16dp"
+                    />
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/compass_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            animatedRotation="@{viewModel.azimuth}"
+            app:layout_constraintTop_toBottomOf="@+id/sv_places"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="36dp"
+            >
+
+            <View
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:background="@drawable/cutsom_azimuth"
+                visible="@{viewModel.isCustomAzimuthSet}"
+                app:layout_constraintBottom_toTopOf="@+id/iv_compass_image"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                />
+
+            <TextView
+                android:id="@+id/compass_north"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="N"
+                android:textStyle="bold"
+                visible="@{!viewModel.isCustomAzimuthSet}"
+                app:layout_constraintBottom_toTopOf="@+id/iv_compass_image"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                tools:visibility="gone"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="S"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@+id/iv_compass_image"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                visible="@{!viewModel.isCustomAzimuthSet}"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="W"
+                android:textStyle="bold"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/iv_compass_image"
+                visible="@{!viewModel.isCustomAzimuthSet}"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="E"
+                android:textStyle="bold"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@+id/iv_compass_image"
+                visible="@{!viewModel.isCustomAzimuthSet}"
+                />
+
+            <ImageView
+                android:id="@+id/iv_compass_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_navigation_black_24dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
