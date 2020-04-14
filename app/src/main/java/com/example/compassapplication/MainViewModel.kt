@@ -83,7 +83,7 @@ class MainViewModel(
     /*
     * LATITUDE & LONGITUDE update destination
     * */
-    private fun updateDestination(){
+    fun updateDestination(){
         viewModelScope.launch {
             val currentLoc = _currentLocation.value
             val lat = if(isLatitudeValid.value == true) latitude.value else null
@@ -91,7 +91,6 @@ class MainViewModel(
 
             if(isLocationPermissionGranted.value == true
                 && currentLoc != null && lat != null && lng != null ) {
-
                 Timber.d("Update destination")
                 _isCustomAzimuthSet.postValue(true)
 
@@ -105,11 +104,9 @@ class MainViewModel(
     }
 
     private val _isCustomAzimuthSet = MutableLiveData(false)
-    val isCustomAzimuthSet = _isCustomAzimuthSet
+    val isCustomAzimuthSet: LiveData<Boolean> = _isCustomAzimuthSet
 
     fun resetCustomAzimuth(){
-//        latitude.value = currentLocation?.latitude
-//        longitude.value = currentLocation?.longitude
         _isCustomAzimuthSet.value = false
         sensorUsecase.clearLocationOffset()
     }
