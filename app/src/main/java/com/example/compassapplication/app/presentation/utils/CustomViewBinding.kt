@@ -1,4 +1,4 @@
-package com.example.compassapplication
+package com.example.compassapplication.app.presentation.utils
 
 import android.location.Location
 import android.view.View

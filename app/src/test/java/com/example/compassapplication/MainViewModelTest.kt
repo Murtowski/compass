@@ -2,10 +2,14 @@ package com.example.compassapplication
 
 import android.location.Location
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
+import com.example.compassapplication.app.presentation.InputError
+import com.example.compassapplication.app.presentation.MainViewModel
+import com.example.compassapplication.core.domain.Azimuth
+import com.example.compassapplication.core.domain.DomainLocation
+import com.example.compassapplication.core.usecases.LocationUsecase
+import com.example.compassapplication.core.usecases.SensorUsecase
 import com.example.compassapplication.util.MainCoroutineRule
 import com.example.compassapplication.util.getOrAwaitValue
-import com.example.compassapplication.util.observeForTesting
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.mockk
@@ -30,19 +34,27 @@ class MainViewModelTest {
 
     private lateinit var viewModel: MainViewModel
 
-    private val azimuthValues = (1..10)
+    private val azimuthValues = (1..10).map { Azimuth(it.toFloat()) }
 
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
 
         val sensorUsecase = spyk<SensorUsecase>()
-        every { sensorUsecase.getAndRegister() } returns azimuthValues.asFlow().map { it.toFloat() }
+        every { sensorUsecase.getAndRegister() } returns flow {
+            for(azimuth in azimuthValues){
+                emit(azimuth)
+            }
+        }
 
         val locationUsecase = mockk<LocationUsecase>()
-        every { locationUsecase.getAndListenLocation() } returns flow { emit(Location("")) }
+        every { locationUsecase.getAndListenLocation() } returns flow { emit(DomainLocation(0.0,0.0)) }
 
-        viewModel = MainViewModel(sensorUsecase, locationUsecase)
+        viewModel =
+            MainViewModel(
+                sensorUsecase,
+                locationUsecase
+            )
     }
 
     @Test

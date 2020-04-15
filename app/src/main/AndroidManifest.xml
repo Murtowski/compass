@@ -12,8 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name=".CompassApplication">
-        <activity android:name=".MainActivity">
+        android:name=".app.CompassApplication">
+        <activity android:name=".app.presentation.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

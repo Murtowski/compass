@@ -1,25 +1,26 @@
-package com.example.compassapplication
+package com.example.compassapplication.core.usecases
 
-import android.hardware.SensorEvent
-import android.location.Location
-import android.location.LocationManager
+import com.example.compassapplication.core.data.LocationSource
+import com.example.compassapplication.core.data.LocationSourceListener
+import com.example.compassapplication.core.domain.DomainLocation
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import timber.log.Timber
 
 interface LocationUsecase{
-    fun getAndListenLocation(): Flow<Location>
+    fun getAndListenLocation(): Flow<DomainLocation>
     fun stop()
 }
 
 internal class LocationUsecaseImpl(
     private val locationSource: LocationSource
-):LocationUsecase, LocationSourceListener{
+): LocationUsecase,
+    LocationSourceListener {
 
-    private val channel = ConflatedBroadcastChannel<Location>()
+    private val channel = ConflatedBroadcastChannel<DomainLocation>()
 
-    override fun getAndListenLocation(): Flow<Location> {
+    override fun getAndListenLocation(): Flow<DomainLocation> {
         Timber.d("Registering new listener to Location")
         locationSource.startListening(this)
         return channel.asFlow()
@@ -29,7 +30,7 @@ internal class LocationUsecaseImpl(
         locationSource.stop()
     }
 
-    override fun locationChanged(currentLocation: Location) {
+    override fun locationChanged(currentLocation: DomainLocation) {
         if (!channel.isClosedForSend) {
             channel.offer(currentLocation)
         }

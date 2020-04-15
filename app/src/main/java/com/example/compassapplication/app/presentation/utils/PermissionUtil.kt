@@ -1,4 +1,4 @@
-package com.example.compassapplication
+package com.example.compassapplication.app.presentation.utils
 
 import android.Manifest
 import android.app.Activity
@@ -21,7 +21,13 @@ object PermissionUtil {
     }
 
     fun isLocationPermissionGranted(context: Context): Boolean{
-        return isPermissionGranted(context, LOCATION_PERMISSION) && isPermissionGranted(context, LOCATION_PERMISSION_FINE)
+        return isPermissionGranted(
+            context,
+            LOCATION_PERMISSION
+        ) && isPermissionGranted(
+            context,
+            LOCATION_PERMISSION_FINE
+        )
     }
 
     fun justifyAskingForPermission(permissionsArray: Array<String>,
@@ -45,6 +51,13 @@ object PermissionUtil {
     }
 
     fun justifyAskingForLocationPermission(activity: Activity, requestPermission: (permissions: Array<String>) -> Unit){
-        justifyAskingForPermission(arrayOf(LOCATION_PERMISSION, LOCATION_PERMISSION_FINE), activity, requestPermission)
+        justifyAskingForPermission(
+            arrayOf(
+                LOCATION_PERMISSION,
+                LOCATION_PERMISSION_FINE
+            ),
+            activity,
+            requestPermission
+        )
     }
 }

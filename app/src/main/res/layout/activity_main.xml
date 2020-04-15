@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <import type="com.example.compassapplication.InputError"/>
+        <import type="com.example.compassapplication.app.presentation.InputError"/>
         <variable
             name="viewModel"
-            type="com.example.compassapplication.MainViewModel" />
+            type="com.example.compassapplication.app.presentation.MainViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

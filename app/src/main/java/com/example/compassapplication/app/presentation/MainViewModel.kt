@@ -1,8 +1,11 @@
-package com.example.compassapplication
+package com.example.compassapplication.app.presentation
 
 import android.location.Location
 import androidx.lifecycle.*
-import kotlinx.coroutines.delay
+import com.example.compassapplication.app.framework.util.DataConverter.toAndroidLocation
+import com.example.compassapplication.app.framework.util.DataConverter.toDomain
+import com.example.compassapplication.core.usecases.SensorUsecase
+import com.example.compassapplication.core.usecases.LocationUsecase
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -12,6 +15,12 @@ import timber.log.Timber
  * @author Piotr Piskorski
  * @date on 02.04.2020.
  */
+
+enum class InputError(val msg: String?){ // Here we may use @StringRes
+    INVALID_FORMAT("Invalid Format"),
+    OUT_OF_RANGE("Given location out of range"),
+    NONE(null)
+}
 
 class MainViewModelFactory(
     private val sensorUsecase: SensorUsecase,
@@ -32,8 +41,8 @@ class MainViewModel(
     * */
     private var previousAzimuth = 0f
     val azimuth: LiveData<Pair<Float,Float>>  = sensorUsecase.getAndRegister().asLiveData().map {
-            val rotation = Pair(previousAzimuth, it)
-            previousAzimuth = it
+            val rotation = Pair(previousAzimuth, it.value)
+            previousAzimuth = it.value
             rotation
         }
 
@@ -50,7 +59,7 @@ class MainViewModel(
     val longitudeError : LiveData<InputError> = longitude.map {
         when{
             it == null -> InputError.INVALID_FORMAT
-            it !in (-180f .. 180f) ->  InputError.OUT_OF_RANGE
+            it !in (-180f .. 180f) -> InputError.OUT_OF_RANGE
             else -> InputError.NONE
         }
     }
@@ -72,7 +81,7 @@ class MainViewModel(
         Timber.d("Edit Lat:$it")
         when{
             it == null -> InputError.INVALID_FORMAT
-            it !in (-90f .. 90f) ->  InputError.OUT_OF_RANGE
+            it !in (-90f .. 90f) -> InputError.OUT_OF_RANGE
             else -> InputError.NONE
         }
     }
@@ -98,7 +107,7 @@ class MainViewModel(
                     it.latitude = lat
                     it.longitude = lng
                 }
-                sensorUsecase.setLocationOffset(currentLoc, newDestination)
+                sensorUsecase.setLocationOffset(currentLoc.toDomain(), newDestination.toDomain())
             }
         }
     }
@@ -124,7 +133,7 @@ class MainViewModel(
             if(permissionGranted == true){
                 viewModelScope.launch {
                     locationUsecase.getAndListenLocation().collect {
-                        _currentLocation.postValue(it)
+                        _currentLocation.postValue(it.toAndroidLocation())
                     }
                 }
 
@@ -160,10 +169,4 @@ class MainViewModel(
         locationUsecase.stop()
         super.onCleared()
     }
-}
-
-enum class InputError(val msg: String?){ // Here we may use @StringRes
-    INVALID_FORMAT("Invalid Format"),
-    OUT_OF_RANGE("Given location out of range"),
-    NONE(null)
 }

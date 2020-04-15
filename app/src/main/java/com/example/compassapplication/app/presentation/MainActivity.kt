@@ -1,15 +1,15 @@
-package com.example.compassapplication
+package com.example.compassapplication.app.presentation
 
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
+import com.example.compassapplication.R
+import com.example.compassapplication.app.presentation.utils.PermissionUtil
 import com.example.compassapplication.databinding.ActivityMainBinding
 import org.koin.android.ext.android.inject
 import timber.log.Timber
-import java.util.jar.Manifest
 
 
 class MainActivity : AppCompatActivity() {
@@ -23,7 +23,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this,
+            R.layout.activity_main
+        )
         binding.lifecycleOwner = this
 
         binding.viewModel = viewModel
@@ -32,12 +34,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestPermission(){
-        if(PermissionUtil.isLocationPermissionGranted(this)){
+        if(PermissionUtil.isLocationPermissionGranted(
+                this
+            )
+        ){
             Timber.d("Permissions Granted")
             viewModel.isLocationPermissionGranted.value = true
         }else {
             viewModel.isLocationPermissionGranted.value = false
-            PermissionUtil.justifyAskingForLocationPermission(this) { permissions ->
+            PermissionUtil.justifyAskingForLocationPermission(
+                this
+            ) { permissions ->
                 ActivityCompat.requestPermissions(
                     this,
                     permissions,
