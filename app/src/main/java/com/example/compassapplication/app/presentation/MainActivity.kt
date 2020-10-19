@@ -19,11 +19,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private val viewModelFactory: MainViewModelFactory by inject()
-    private val viewModel by  viewModels<MainViewModel> { viewModelFactory }
+    private val viewModel by viewModels<MainViewModel> { viewModelFactory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this,
+        binding = DataBindingUtil.setContentView(
+            this,
             R.layout.activity_main
         )
         binding.lifecycleOwner = this
@@ -33,14 +34,11 @@ class MainActivity : AppCompatActivity() {
         requestPermission()
     }
 
-    private fun requestPermission(){
-        if(PermissionUtil.isLocationPermissionGranted(
-                this
-            )
-        ){
+    private fun requestPermission() {
+        if (PermissionUtil.isLocationPermissionGranted(this)) {
             Timber.d("Permissions Granted")
             viewModel.isLocationPermissionGranted.value = true
-        }else {
+        } else {
             viewModel.isLocationPermissionGranted.value = false
             PermissionUtil.justifyAskingForLocationPermission(
                 this

@@ -16,18 +16,20 @@ interface SensorUsecase {
     fun setLocationOffset(currentLocation: DomainLocation, destinationLocation: DomainLocation)
     fun clearLocationOffset()
     fun stop()
-
-
 }
 
-internal class SensorUsecaseImpl(private val sensorSource: SensorSource,
-                                 private val sensorInterpreter: SensorInterpreter
-): SensorUsecase, SensorListener {
+internal class SensorUsecaseImpl(
+    private val sensorSource: SensorSource,
+    private val sensorInterpreter: SensorInterpreter
+) : SensorUsecase, SensorListener {
 
     // only the the most recently sent value is received, while previously sent elements are lost
     private val channel = ConflatedBroadcastChannel<Azimuth>()
 
-    override fun setLocationOffset(currentLocation: DomainLocation, destinationLocation: DomainLocation){
+    override fun setLocationOffset(
+        currentLocation: DomainLocation,
+        destinationLocation: DomainLocation
+    ) {
         sensorInterpreter.addLocationAngle(currentLocation, destinationLocation)
     }
 
