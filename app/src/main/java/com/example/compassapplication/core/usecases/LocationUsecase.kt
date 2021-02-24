@@ -3,20 +3,23 @@ package com.example.compassapplication.core.usecases
 import com.example.compassapplication.core.data.LocationSource
 import com.example.compassapplication.core.data.LocationSourceListener
 import com.example.compassapplication.core.domain.DomainLocation
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import timber.log.Timber
 
-interface LocationUsecase{
+interface LocationUsecase {
     fun getAndListenLocation(): Flow<DomainLocation>
     fun stop()
 }
 
+@ExperimentalCoroutinesApi
 internal class LocationUsecaseImpl(
     private val locationSource: LocationSource
-): LocationUsecase,
+) : LocationUsecase,
     LocationSourceListener {
+
 
     private val channel = ConflatedBroadcastChannel<DomainLocation>()
 

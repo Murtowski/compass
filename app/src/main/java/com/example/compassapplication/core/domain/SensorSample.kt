@@ -1,11 +1,11 @@
 package com.example.compassapplication.core.domain
 
-enum class SensorType{
+enum class SensorType {
     ACCELEROMETER,
     MAGNETOMETER
 }
 
-data class SensorSample (
+data class SensorSample(
     val values: FloatArray,
     val sensorType: SensorType
 )

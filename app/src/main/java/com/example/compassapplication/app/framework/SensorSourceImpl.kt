@@ -9,11 +9,11 @@ import com.example.compassapplication.core.data.SensorSource
 import com.example.compassapplication.core.domain.SensorSample
 import com.example.compassapplication.core.domain.SensorType
 
-class SensorSourceImpl(private var sensorManager: SensorManager):
+class SensorSourceImpl(private var sensorManager: SensorManager) :
     SensorSource,
     SensorEventListener {
 
-    var listener: SensorListener?= null
+    var listener: SensorListener? = null
 
     override fun registerListenerAndStart(listener: SensorListener) {
         this.listener = listener
@@ -25,7 +25,7 @@ class SensorSourceImpl(private var sensorManager: SensorManager):
         stopListening()
     }
 
-    private fun startListening(){
+    private fun startListening() {
         val sensorMagnetic = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
         val sensorAccelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         val sampling = SensorManager.SENSOR_DELAY_GAME
@@ -33,13 +33,11 @@ class SensorSourceImpl(private var sensorManager: SensorManager):
         sensorManager.registerListener(this, sensorAccelerometer, sampling)
     }
 
-    private fun stopListening(){
+    private fun stopListening() {
         sensorManager.unregisterListener(this)
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-
-    }
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) { /**/}
 
     override fun onSensorChanged(event: SensorEvent?) {
         event?.let {
@@ -49,8 +47,8 @@ class SensorSourceImpl(private var sensorManager: SensorManager):
     }
 }
 
-fun SensorEvent.getType(): SensorType{
-    return when(sensor.type){
+fun SensorEvent.getType(): SensorType {
+    return when (sensor.type) {
         Sensor.TYPE_MAGNETIC_FIELD -> SensorType.MAGNETOMETER
         Sensor.TYPE_ACCELEROMETER -> SensorType.ACCELEROMETER
         else -> throw IllegalArgumentException("We should use that sensor: ${sensor.type}")

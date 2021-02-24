@@ -15,11 +15,11 @@ import kotlin.math.sin
 
 const val alpha = 0.97f
 
-class SensorInterpreterImpl(private val sensorManager: SensorManager):
+class SensorInterpreterImpl(private val sensorManager: SensorManager) :
     SensorInterpreter {
 
-    private val gravity = floatArrayOf(0f,0f,0f)
-    private val magnetic = floatArrayOf(0f,0f,0f)
+    private val gravity = floatArrayOf(0f, 0f, 0f)
+    private val magnetic = floatArrayOf(0f, 0f, 0f)
 
     private var offsetAngle = 0f
 
@@ -27,7 +27,10 @@ class SensorInterpreterImpl(private val sensorManager: SensorManager):
         offsetAngle = 0f
     }
 
-    override fun addLocationAngle(currentLocation: DomainLocation, destinationLocation: DomainLocation) {
+    override fun addLocationAngle(
+        currentLocation: DomainLocation,
+        destinationLocation: DomainLocation
+    ) {
         offsetAngle = calculateBearingAngle(
             currentLocation.lat, currentLocation.lng,
             destinationLocation.lat, destinationLocation.lng
@@ -35,7 +38,7 @@ class SensorInterpreterImpl(private val sensorManager: SensorManager):
         Timber.d("New Location offet counted: $offsetAngle")
     }
 
-    fun calculateBearingAngle(
+    private fun calculateBearingAngle(
         lat1: Double,
         lon1: Double,
         lat2: Double,
@@ -52,32 +55,29 @@ class SensorInterpreterImpl(private val sensorManager: SensorManager):
     }
 
     override fun calculateNorthAngle(data: SensorSample): Float? {
-        if(data.sensorType == SensorType.ACCELEROMETER){
-            for(i in 0..2){
-                gravity[i] = alpha * gravity[i] + (1- alpha) * data.values[i]
+        if (data.sensorType == SensorType.ACCELEROMETER) {
+            for (i in 0..2) {
+                gravity[i] = alpha * gravity[i] + (1 - alpha) * data.values[i]
             }
 
         }
 
-        if(data.sensorType == SensorType.MAGNETOMETER){
-            for(i in 0..2){
+        if (data.sensorType == SensorType.MAGNETOMETER) {
+            for (i in 0..2) {
                 magnetic[i] = alpha * magnetic[i] + (1 - alpha) * data.values[i]
             }
         }
 
-        val R = floatArrayOf(0f,0f,0f,0f,0f,0f,0f,0f,0f)
-        val I = floatArrayOf(0f,0f,0f,0f,0f,0f,0f,0f,0f)
-        if(SensorManager.getRotationMatrix(R, I, gravity, magnetic)){
-            val orientation = floatArrayOf(0f,0f,0f)
+        val R = floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
+        val I = floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
+
+        return if (SensorManager.getRotationMatrix(R, I, gravity, magnetic)) {
+            val orientation = floatArrayOf(0f, 0f, 0f)
             SensorManager.getOrientation(R, orientation)
             val azimuth = Math.toDegrees(orientation[0].toDouble())
-            return azimuth.toFloat() - offsetAngle
-        }else
-            return null
-
-
-
+            azimuth.toFloat() - offsetAngle
+        } else {
+            null
+        }
     }
 }
-
-

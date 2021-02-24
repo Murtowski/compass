@@ -1,9 +1,8 @@
 package com.example.compassapplication.core.data
 
-import android.location.Location
 import com.example.compassapplication.core.domain.DomainLocation
 
-interface LocationSourceListener{
+interface LocationSourceListener {
     fun locationChanged(currentLocation: DomainLocation)
 }
 

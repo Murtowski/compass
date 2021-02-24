@@ -42,13 +42,20 @@ class MainViewModelTest {
 
         val sensorUsecase = spyk<SensorUsecase>()
         every { sensorUsecase.getAndRegister() } returns flow {
-            for(azimuth in azimuthValues){
+            for (azimuth in azimuthValues) {
                 emit(azimuth)
             }
         }
 
         val locationUsecase = mockk<LocationUsecase>()
-        every { locationUsecase.getAndListenLocation() } returns flow { emit(DomainLocation(0.0,0.0)) }
+        every { locationUsecase.getAndListenLocation() } returns flow {
+            emit(
+                DomainLocation(
+                    0.0,
+                    0.0
+                )
+            )
+        }
 
         viewModel =
             MainViewModel(
@@ -58,7 +65,7 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `test lat validation`(){
+    fun `test lat validation`() {
         viewModel.latitude.value = null // Biding adapter returns null if it cannot parse
 
         assert(viewModel.latitudeError.getOrAwaitValue() == InputError.INVALID_FORMAT)
@@ -73,7 +80,7 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `test lng validation`(){
+    fun `test lng validation`() {
         viewModel.longitude.value = null
         assert(viewModel.isLongitudeValid.getOrAwaitValue() == false)
 
@@ -84,7 +91,7 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `test update location`(){
+    fun `test update location`() {
         assert(viewModel.currentLocation.getOrAwaitValue() == null)
 
         viewModel.isLocationPermissionGranted.value = true
@@ -94,7 +101,7 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `test update azimuth`(){
+    fun `test update azimuth`() {
         assert(viewModel.isCustomAzimuthSet.getOrAwaitValue() == false)
 
         `test update location`()
@@ -103,7 +110,7 @@ class MainViewModelTest {
 
         viewModel.updateDestination()
 
-        assert(viewModel.isCustomAzimuthSet.getOrAwaitValue() == true){
+        assert(viewModel.isCustomAzimuthSet.getOrAwaitValue() == true) {
             println("latValid: ${viewModel.isLatitudeValid.getOrAwaitValue()}")
             println("lngValid: ${viewModel.isLongitudeValid.getOrAwaitValue()}")
             println("loc: ${viewModel.currentLocation.getOrAwaitValue() != null}")
@@ -114,8 +121,4 @@ class MainViewModelTest {
 
         assert(viewModel.isCustomAzimuthSet.getOrAwaitValue() == false)
     }
-
-
-
-
 }

@@ -14,8 +14,6 @@ import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
-    private val REQUEST_CODE_LOCATION = 123
-
     private lateinit var binding: ActivityMainBinding
 
     private val viewModelFactory: MainViewModelFactory by inject()
@@ -61,5 +59,9 @@ class MainActivity : AppCompatActivity() {
             REQUEST_CODE_LOCATION -> requestPermission()
             else -> super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         }
+    }
+
+    companion object{
+        private const val REQUEST_CODE_LOCATION = 123
     }
 }

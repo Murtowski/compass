@@ -8,18 +8,11 @@ import com.example.compassapplication.core.domain.SensorSample
  * @date on 02.04.2020.
  */
 
-interface SensorListener{
+interface SensorListener {
     fun onSensorData(data: SensorSample)
 }
 
-
-interface SensorSource{
+interface SensorSource {
     fun registerListenerAndStart(listener: SensorListener)
     fun unregisterListenerAndStop()
-
 }
-
-
-
-
-

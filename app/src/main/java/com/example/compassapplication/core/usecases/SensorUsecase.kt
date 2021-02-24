@@ -6,6 +6,7 @@ import com.example.compassapplication.core.data.SensorSource
 import com.example.compassapplication.core.domain.Azimuth
 import com.example.compassapplication.core.domain.DomainLocation
 import com.example.compassapplication.core.domain.SensorSample
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -18,6 +19,7 @@ interface SensorUsecase {
     fun stop()
 }
 
+@ExperimentalCoroutinesApi
 internal class SensorUsecaseImpl(
     private val sensorSource: SensorSource,
     private val sensorInterpreter: SensorInterpreter

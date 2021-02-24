@@ -56,8 +56,10 @@ class CompassApplication : Application() {
 
     private val locationModule = module {
         factory { applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager }
-        factory { LocationServices.getFusedLocationProviderClient(applicationContext)
-            as FusedLocationProviderClient }
+        factory {
+            LocationServices.getFusedLocationProviderClient(applicationContext)
+                    as FusedLocationProviderClient
+        }
         factory<LocationSource> { LocationSourceImpl(get(), get()) }
         single<LocationUsecase> { LocationUsecaseImpl(get()) }
     }
