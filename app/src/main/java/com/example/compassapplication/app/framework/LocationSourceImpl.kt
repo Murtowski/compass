@@ -41,7 +41,7 @@ class LocationSourceImpl(
     }
 
     override fun onLocationChanged(location: Location) {
-        Timber.d("New location: ${location?.toString()}")
+        Timber.d("New location: $location")
         listener?.locationChanged(location.toDomain())
     }
 

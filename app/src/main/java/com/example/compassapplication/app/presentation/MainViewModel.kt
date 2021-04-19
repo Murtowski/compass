@@ -6,6 +6,7 @@ import com.example.compassapplication.app.framework.util.DataConverter.toAndroid
 import com.example.compassapplication.app.framework.util.DataConverter.toDomain
 import com.example.compassapplication.core.usecases.LocationUsecase
 import com.example.compassapplication.core.usecases.SensorUsecase
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -35,6 +36,9 @@ class MainViewModel(
     private val sensorUsecase: SensorUsecase,
     private val locationUsecase: LocationUsecase
 ) : ViewModel() {
+    val cancellationHandler = CoroutineExceptionHandler { _, exception ->
+        Timber.d("CoroutineExceptionHandler got $exception")
+    }
 
     /*
     * Count Azimuth, by default to NORTH
@@ -93,7 +97,7 @@ class MainViewModel(
     * LATITUDE & LONGITUDE update destination
     * */
     fun updateDestination() {
-        viewModelScope.launch {
+        viewModelScope.launch(cancellationHandler) {
             val currentLoc = _currentLocation.value
             val lat = if (isLatitudeValid.value == true) latitude.value else null
             val lng = if (isLongitudeValid.value == true) longitude.value else null
@@ -132,7 +136,7 @@ class MainViewModel(
             super.setValue(permissionGranted)
             Timber.d("Location permission changed: $permissionGranted")
             if (permissionGranted == true) {
-                viewModelScope.launch {
+                viewModelScope.launch(cancellationHandler) {
                     locationUsecase.getAndListenLocation().collect {
                         _currentLocation.postValue(it.toAndroidLocation())
                     }
@@ -167,7 +171,6 @@ class MainViewModel(
     * */
     override fun onCleared() {
         sensorUsecase.stop()
-        locationUsecase.stop()
         super.onCleared()
     }
 }

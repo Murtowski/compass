@@ -4,38 +4,30 @@ import com.example.compassapplication.core.data.LocationSource
 import com.example.compassapplication.core.data.LocationSourceListener
 import com.example.compassapplication.core.domain.DomainLocation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.callbackFlow
 import timber.log.Timber
 
 interface LocationUsecase {
     fun getAndListenLocation(): Flow<DomainLocation>
-    fun stop()
 }
 
 @ExperimentalCoroutinesApi
 internal class LocationUsecaseImpl(
     private val locationSource: LocationSource
-) : LocationUsecase,
-    LocationSourceListener {
+) : LocationUsecase {
 
-
-    private val channel = ConflatedBroadcastChannel<DomainLocation>()
-
-    override fun getAndListenLocation(): Flow<DomainLocation> {
+    override fun getAndListenLocation(): Flow<DomainLocation> = callbackFlow {
         Timber.d("Registering new listener to Location")
-        locationSource.startListening(this)
-        return channel.asFlow()
-    }
-
-    override fun stop() {
-        locationSource.stop()
-    }
-
-    override fun locationChanged(currentLocation: DomainLocation) {
-        if (!channel.isClosedForSend) {
-            channel.offer(currentLocation)
+        val locationCallback = object : LocationSourceListener {
+            override fun locationChanged(currentLocation: DomainLocation) {
+                offer(currentLocation)
+            }
         }
+
+        locationSource.startListening(locationCallback)
+
+        awaitClose { locationSource.stop() }
     }
 }
