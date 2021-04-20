@@ -1,6 +1,5 @@
 package com.example.compassapplication
 
-import android.location.Location
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.compassapplication.app.presentation.InputError
 import com.example.compassapplication.app.presentation.MainViewModel
@@ -15,9 +14,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -41,7 +38,7 @@ class MainViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
 
         val sensorUsecase = spyk<SensorUsecase>()
-        every { sensorUsecase.getAndRegister() } returns flow {
+        every { sensorUsecase.getAndListenSensor() } returns flow {
             for (azimuth in azimuthValues) {
                 emit(azimuth)
             }

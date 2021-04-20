@@ -1,42 +1,28 @@
 package com.example.compassapplication.app.framework
 
-import android.hardware.Sensor
-import android.hardware.SensorEvent
 import android.hardware.SensorManager
-import android.location.Location
 import com.example.compassapplication.core.data.SensorInterpreter
 import com.example.compassapplication.core.domain.DomainLocation
 import com.example.compassapplication.core.domain.SensorSample
 import com.example.compassapplication.core.domain.SensorType
-import timber.log.Timber
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
 const val alpha = 0.97f
 
-class SensorInterpreterImpl(private val sensorManager: SensorManager) :
-    SensorInterpreter {
+class SensorInterpreterImpl : SensorInterpreter {
 
     private val gravity = floatArrayOf(0f, 0f, 0f)
     private val magnetic = floatArrayOf(0f, 0f, 0f)
 
-    private var offsetAngle = 0f
-
-    override fun clearLocationAngle() {
-        offsetAngle = 0f
-    }
-
-    override fun addLocationAngle(
+    override fun calculateLocationAngle(
         currentLocation: DomainLocation,
         destinationLocation: DomainLocation
-    ) {
-        offsetAngle = calculateBearingAngle(
-            currentLocation.lat, currentLocation.lng,
-            destinationLocation.lat, destinationLocation.lng
-        )
-        Timber.d("New Location offet counted: $offsetAngle")
-    }
+    ) = calculateBearingAngle(
+        currentLocation.lat, currentLocation.lng,
+        destinationLocation.lat, destinationLocation.lng
+    )
 
     private fun calculateBearingAngle(
         lat1: Double,
@@ -54,12 +40,11 @@ class SensorInterpreterImpl(private val sensorManager: SensorManager) :
         return Math.toDegrees(Theta).toFloat()
     }
 
-    override fun calculateNorthAngle(data: SensorSample): Float? {
+    override fun calculateNorthAngle(data: SensorSample, locationAngle: Float): Float? {
         if (data.sensorType == SensorType.ACCELEROMETER) {
             for (i in 0..2) {
                 gravity[i] = alpha * gravity[i] + (1 - alpha) * data.values[i]
             }
-
         }
 
         if (data.sensorType == SensorType.MAGNETOMETER) {
@@ -75,7 +60,7 @@ class SensorInterpreterImpl(private val sensorManager: SensorManager) :
             val orientation = floatArrayOf(0f, 0f, 0f)
             SensorManager.getOrientation(R, orientation)
             val azimuth = Math.toDegrees(orientation[0].toDouble())
-            azimuth.toFloat() - offsetAngle
+            azimuth.toFloat() - locationAngle
         } else {
             null
         }

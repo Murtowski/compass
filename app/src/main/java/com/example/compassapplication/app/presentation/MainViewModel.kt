@@ -1,13 +1,12 @@
 package com.example.compassapplication.app.presentation
 
-import android.location.Location
 import androidx.lifecycle.*
-import com.example.compassapplication.app.framework.util.DataConverter.toAndroidLocation
-import com.example.compassapplication.app.framework.util.DataConverter.toDomain
+import com.example.compassapplication.core.data.SensorInterpreter
+import com.example.compassapplication.core.domain.DomainLocation
 import com.example.compassapplication.core.usecases.LocationUsecase
 import com.example.compassapplication.core.usecases.SensorUsecase
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -25,41 +24,27 @@ enum class InputError(val msg: String?) { // Here we may use @StringRes
 
 class MainViewModelFactory(
     private val sensorUsecase: SensorUsecase,
+    private val sensorInterpreter: SensorInterpreter,
     private val locationUsecase: LocationUsecase
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T = MainViewModel(
-        sensorUsecase, locationUsecase
+        sensorUsecase, sensorInterpreter, locationUsecase
     ) as T
 }
 
 class MainViewModel(
     private val sensorUsecase: SensorUsecase,
+    private val sensorInterpreter: SensorInterpreter,
     private val locationUsecase: LocationUsecase
 ) : ViewModel() {
-    val cancellationHandler = CoroutineExceptionHandler { _, exception ->
+    private val cancellationHandler = CoroutineExceptionHandler { _, exception ->
         Timber.d("CoroutineExceptionHandler got $exception")
-    }
-
-    /*
-    * Count Azimuth, by default to NORTH
-    * */
-    private var previousAzimuth = 0f
-    val azimuth: LiveData<Pair<Float, Float>> = sensorUsecase.getAndRegister().asLiveData().map {
-        val rotation = Pair(previousAzimuth, it.value)
-        previousAzimuth = it.value
-        rotation
     }
 
     /*
     * LONGITUDE
     * */
-    val longitude = object : MutableLiveData<Double?>(0.0) {
-        override fun setValue(value: Double?) {
-            super.setValue(value)
-            Timber.d("Updating longitude")
-            updateDestination()
-        }
-    }
+    val longitude = MutableLiveData(0.0)
     val longitudeError: LiveData<InputError> = longitude.map {
         when (it) {
             null -> InputError.INVALID_FORMAT
@@ -74,13 +59,7 @@ class MainViewModel(
     /*
     * LATITUDE
     * */
-    val latitude = object : MutableLiveData<Double?>(0.0) {
-        override fun setValue(value: Double?) {
-            super.setValue(value)
-            Timber.d("Updating latitude")
-            updateDestination()
-        }
-    }
+    val latitude = MutableLiveData(0.0)
     val latitudeError: LiveData<InputError> = latitude.map {
         Timber.d("Edit Lat:$it")
         when (it) {
@@ -89,88 +68,120 @@ class MainViewModel(
             else -> InputError.NONE
         }
     }
-    val isLatitudeValid: LiveData<Boolean> = latitudeError.map {
-        it == InputError.NONE
-    }
+    val isLatitudeValid: LiveData<Boolean> = latitudeError.map { it == InputError.NONE }
 
     /*
-    * LATITUDE & LONGITUDE update destination
+    * Update DESTINATION based on LATITUDE & LONGITUDE updates
     * */
-    fun updateDestination() {
-        viewModelScope.launch(cancellationHandler) {
-            val currentLoc = _currentLocation.value
-            val lat = if (isLatitudeValid.value == true) latitude.value else null
-            val lng = if (isLongitudeValid.value == true) longitude.value else null
+    private val destinationMediatorLiveData = MediatorLiveData<Pair<Double, Double>>().apply {
+        addSource(isLatitudeValid) { setNewDestination() }
+        addSource(isLongitudeValid) { setNewDestination() }
+    }
 
-            if (isLocationPermissionGranted.value == true
-                && currentLoc != null && lat != null && lng != null
-            ) {
-                Timber.d("Update destination")
-                _isCustomAzimuthSet.postValue(true)
-
-                val newDestination = Location("").also {
-                    it.latitude = lat
-                    it.longitude = lng
-                }
-                sensorUsecase.setLocationOffset(currentLoc.toDomain(), newDestination.toDomain())
-            }
+    private fun setNewDestination(destination: DestinationLocation? = null) {
+        if (destination != null) destination.location
+        else if (isLatitudeValid.value == true && isLongitudeValid.value == true) {
+            DestinationLocation.Custom(
+                latitude.value ?: throw IllegalStateException(),
+                longitude.value ?: throw IllegalStateException()
+            )
+        } else {
+            null
+        }?.let {
+            destinationMediatorLiveData.value
+            _isCustomAzimuthSet.postValue(true)
         }
     }
 
-    private val _isCustomAzimuthSet = MutableLiveData(false)
-    val isCustomAzimuthSet: LiveData<Boolean> = _isCustomAzimuthSet
-
-    fun resetCustomAzimuth() {
-        _isCustomAzimuthSet.value = false
-        sensorUsecase.clearLocationOffset()
-    }
-
     /*
-    * Location
+    * Track current Location
     * */
-    private val _currentLocation = MutableLiveData<Location?>(null)
-    val currentLocation: LiveData<Location?> = _currentLocation
+    private val _currentLocation = MutableLiveData<DomainLocation>(null)
+    val currentLocation: LiveData<DomainLocation> = _currentLocation
 
     val isLocationPermissionGranted = object : MutableLiveData<Boolean?>(null) {
         override fun setValue(permissionGranted: Boolean?) {
             super.setValue(permissionGranted)
             Timber.d("Location permission changed: $permissionGranted")
             if (permissionGranted == true) {
-                viewModelScope.launch(cancellationHandler) {
-                    locationUsecase.getAndListenLocation().collect {
-                        _currentLocation.postValue(it.toAndroidLocation())
-                    }
-                }
-
+                runCompass()
             }
         }
     }
 
-    fun setWroclaw() {
-        latitude.value = 51.107883
-        longitude.value = 17.038538
+    /*
+    * Calculate location angle
+    * */
+    private val _isCustomAzimuthSet = MutableLiveData(false)
+    val isCustomAzimuthSet: LiveData<Boolean> = _isCustomAzimuthSet
+
+    fun resetCustomAzimuth() {
+        viewModelScope.launch { locationAngle.emit(0f) }
+        _isCustomAzimuthSet.value = false
     }
 
-    fun setMountEverest() {
-        latitude.value = 27.986065
-        longitude.value = 86.922623
-    }
-
-    fun setPraga() {
-        latitude.value = 50.073658
-        longitude.value = 14.418540
-    }
-
-    fun setLosAngeles() {
-        latitude.value = 34.052235
-        longitude.value = -118.243683
+    private val locationAngle: MutableStateFlow<Float> by lazy {
+        MutableStateFlow(0f).also { locationAngle ->
+            combine(
+                locationUsecase.getAndListenLocation()
+                    .onEach { _currentLocation.postValue(it) },
+                destinationMediatorLiveData.asFlow()
+                    .debounce(DEBOUNCE_TIME_MILLIS)
+                    .map { pair -> DomainLocation(pair.first, pair.second) }
+            ) { location, destination ->
+                sensorInterpreter.calculateLocationAngle(location, destination)
+            }.onEach { newLocationAngle ->
+                locationAngle.emit(newLocationAngle)
+            }.launchIn(viewModelScope)
+        }
     }
 
     /*
-    * Clear
+    * Count Azimuth, by default is NORTH with 0 rotation angle
     * */
-    override fun onCleared() {
-        sensorUsecase.stop()
-        super.onCleared()
+    private var previousAzimuth = 0f
+    val _azimuth: MutableLiveData<Pair<Float, Float>> = MutableLiveData()
+    val azimuth: LiveData<Pair<Float, Float>> = _azimuth
+
+    private fun runCompass() = viewModelScope.launch(cancellationHandler) {
+        combine(
+            locationAngle,
+            sensorUsecase.getAndListenSensor()
+        ) { locationAngle, sensorData ->
+            sensorInterpreter.calculateNorthAngle(sensorData, locationAngle)
+        }.filterNotNull()
+            .collect { newAzimuth ->
+                val rotation = Pair(previousAzimuth, newAzimuth)
+                previousAzimuth = newAzimuth
+                _azimuth.postValue(rotation)
+            }
+    }
+
+    fun setWroclaw() {
+        setNewDestination(DestinationLocation.Wroclaw)
+    }
+
+    fun setMountEverest() {
+        setNewDestination(DestinationLocation.MountEverest)
+    }
+
+    fun setPrague() {
+        setNewDestination(DestinationLocation.Prague)
+    }
+
+    fun setLosAngeles() {
+        setNewDestination(DestinationLocation.LosAngeles)
+    }
+
+    companion object {
+        const val DEBOUNCE_TIME_MILLIS = 1000L
+    }
+
+    sealed class DestinationLocation(val location: Pair<Double, Double>) {
+        object Wroclaw : DestinationLocation(Pair(51.107883, 17.038538))
+        object MountEverest : DestinationLocation(Pair(27.986065, 86.922623))
+        object Prague : DestinationLocation(Pair(50.073658, 14.418540))
+        object LosAngeles : DestinationLocation(Pair(34.052235, -118.243683))
+        class Custom(lat: Double, lng: Double) : DestinationLocation(Pair(lat, lng))
     }
 }

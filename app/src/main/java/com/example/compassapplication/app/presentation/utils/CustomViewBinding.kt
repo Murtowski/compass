@@ -7,6 +7,7 @@ import android.view.animation.RotateAnimation
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.databinding.InverseBindingAdapter
+import com.example.compassapplication.core.domain.DomainLocation
 
 object CustomViewBinding {
 
@@ -52,7 +53,7 @@ object CustomViewBinding {
 
     @BindingAdapter("permissionGranted", "locationFound")
     @JvmStatic
-    fun View.changeEnableStatus(permissionGranted: Boolean?, locationFound: Location?) {
+    fun View.changeEnableStatus(permissionGranted: Boolean?, locationFound: DomainLocation?) {
         isEnabled = (permissionGranted ?: true) && locationFound != null
     }
 
@@ -76,11 +77,11 @@ object CustomViewBinding {
 
     @BindingAdapter("currentLocation")
     @JvmStatic
-    fun TextView.setCurrentLocation(location: Location?) {
+    fun TextView.setCurrentLocation(location: DomainLocation?) {
         text = if (location == null) {
             "Searching..."
         } else {
-            "${location.latitude} / ${location.longitude}"
+            "${location.lat} / ${location.lng}"
         }
     }
 }
