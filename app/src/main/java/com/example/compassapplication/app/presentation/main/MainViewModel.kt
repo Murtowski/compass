@@ -154,6 +154,9 @@ class MainViewModel(
             }
     }
 
+    /*
+    * Set pre-defined destinations
+    * */
     fun setWroclaw() {
         setNewDestination(DestinationLocation.Wroclaw)
     }
