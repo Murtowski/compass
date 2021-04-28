@@ -1,6 +1,7 @@
-package com.example.compassapplication.app.presentation
+package com.example.compassapplication.app.presentation.main
 
 import androidx.lifecycle.*
+import com.example.compassapplication.app.presentation.common.InputError
 import com.example.compassapplication.core.data.SensorInterpreter
 import com.example.compassapplication.core.domain.DomainLocation
 import com.example.compassapplication.core.usecases.LocationUsecase
@@ -15,13 +16,6 @@ import timber.log.Timber
  * @author Piotr Piskorski
  * @date on 02.04.2020.
  */
-
-enum class InputError(val msg: String?) { // Here we may use @StringRes
-    INVALID_FORMAT("Invalid Format"),
-    OUT_OF_RANGE("Given location out of range"),
-    NONE(null)
-}
-
 class MainViewModelFactory(
     private val sensorUsecase: SensorUsecase,
     private val sensorInterpreter: SensorInterpreter,
@@ -61,7 +55,6 @@ class MainViewModel(
     * */
     val latitude = MutableLiveData(0.0)
     val latitudeError: LiveData<InputError> = latitude.map {
-        Timber.d("Edit Lat:$it")
         when (it) {
             null -> InputError.INVALID_FORMAT
             !in (-90f..90f) -> InputError.OUT_OF_RANGE
@@ -71,25 +64,27 @@ class MainViewModel(
     val isLatitudeValid: LiveData<Boolean> = latitudeError.map { it == InputError.NONE }
 
     /*
-    * Update DESTINATION based on LATITUDE & LONGITUDE updates
+    * Update DESTINATION based on chosen LATITUDE & LONGITUDE updates
     * */
     private val destinationMediatorLiveData = MediatorLiveData<Pair<Double, Double>>().apply {
-        addSource(isLatitudeValid) { setNewDestination() }
-        addSource(isLongitudeValid) { setNewDestination() }
+        addSource(latitude) { createNewDestinationFromLatLng() }
+        addSource(longitude) { createNewDestinationFromLatLng() }
     }
 
-    private fun setNewDestination(destination: DestinationLocation? = null) {
-        if (destination != null) destination.location
-        else if (isLatitudeValid.value == true && isLongitudeValid.value == true) {
-            DestinationLocation.Custom(
-                latitude.value ?: throw IllegalStateException(),
-                longitude.value ?: throw IllegalStateException()
-            )
-        } else {
-            null
-        }?.let {
-            destinationMediatorLiveData.value
-            _isCustomAzimuthSet.postValue(true)
+    private fun createNewDestinationFromLatLng() {
+        if (isLatitudeValid.value == true && isLongitudeValid.value == true) {
+            DestinationLocation.of(latitude.value, longitude.value)?.let { destination ->
+                setNewDestination(destination)
+            }
+        }
+    }
+
+    private fun setNewDestination(destination: DestinationLocation) {
+        destinationMediatorLiveData.value = destination.location
+        _isCustomAzimuthSet.postValue(true)
+        if (destination !is DestinationLocation.Custom) {
+            latitude.value = destination.location.first
+            longitude.value = destination.location.second
         }
     }
 
@@ -140,7 +135,7 @@ class MainViewModel(
     * Count Azimuth, by default is NORTH with 0 rotation angle
     * */
     private var previousAzimuth = 0f
-    val _azimuth: MutableLiveData<Pair<Float, Float>> = MutableLiveData()
+    private val _azimuth: MutableLiveData<Pair<Float, Float>> = MutableLiveData()
     val azimuth: LiveData<Pair<Float, Float>> = _azimuth
 
     private fun runCompass() = viewModelScope.launch(cancellationHandler) {
@@ -183,5 +178,11 @@ class MainViewModel(
         object Prague : DestinationLocation(Pair(50.073658, 14.418540))
         object LosAngeles : DestinationLocation(Pair(34.052235, -118.243683))
         class Custom(lat: Double, lng: Double) : DestinationLocation(Pair(lat, lng))
+
+        companion object {
+            fun of(lat: Double?, lng: Double?): Custom? =
+                if (lat != null && lng != null) Custom(lat, lng)
+                else null
+        }
     }
 }

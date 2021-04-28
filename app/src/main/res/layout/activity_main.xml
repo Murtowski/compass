@@ -5,11 +5,11 @@
 
     <data>
 
-        <import type="com.example.compassapplication.app.presentation.InputError" />
+        <import type="com.example.compassapplication.app.presentation.common.InputError" />
 
         <variable
             name="viewModel"
-            type="com.example.compassapplication.app.presentation.MainViewModel" />
+            type="com.example.compassapplication.app.presentation.main.MainViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -120,16 +120,6 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!--        <View-->
-        <!--            android:id="@+id/v_permission"-->
-        <!--            android:layout_width="0dp"-->
-        <!--            android:layout_height="0dp"-->
-        <!--            permissionVisibility="@{viewModel.isLocationPermissionGranted}"-->
-        <!--            app:layout_constraintLeft_toLeftOf="@+id/til_lat"-->
-        <!--            app:layout_constraintTop_toTopOf="@+id/til_lat"-->
-        <!--            app:layout_constraintBottom_toBottomOf="@+id/til_lat"-->
-        <!--            app:layout_constraintRight_toRightOf="@id/til_long"/>-->
-
         <HorizontalScrollView
             android:id="@+id/sv_places"
             android:layout_width="match_parent"
@@ -139,8 +129,9 @@
             app:layout_constraintTop_toBottomOf="@+id/til_lat">
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
                 <Button
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"

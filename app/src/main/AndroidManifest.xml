@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:name=".app.CompassApplication">
-        <activity android:name=".app.presentation.MainActivity">
+        <activity android:name=".app.presentation.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

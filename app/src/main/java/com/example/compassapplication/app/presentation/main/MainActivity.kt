@@ -1,4 +1,4 @@
-package com.example.compassapplication.app.presentation
+package com.example.compassapplication.app.presentation.main
 
 import android.os.Bundle
 import androidx.activity.viewModels
@@ -10,7 +10,6 @@ import com.example.compassapplication.app.presentation.utils.PermissionUtil
 import com.example.compassapplication.databinding.ActivityMainBinding
 import org.koin.android.ext.android.inject
 import timber.log.Timber
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -61,7 +60,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    companion object{
+    companion object {
         private const val REQUEST_CODE_LOCATION = 123
     }
 }

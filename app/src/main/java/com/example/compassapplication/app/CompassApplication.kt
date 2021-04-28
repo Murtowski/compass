@@ -8,8 +8,8 @@ import com.example.compassapplication.BuildConfig
 import com.example.compassapplication.app.framework.LocationSourceImpl
 import com.example.compassapplication.app.framework.SensorInterpreterImpl
 import com.example.compassapplication.app.framework.SensorSourceImpl
-import com.example.compassapplication.app.presentation.MainViewModel
-import com.example.compassapplication.app.presentation.MainViewModelFactory
+import com.example.compassapplication.app.presentation.main.MainViewModel
+import com.example.compassapplication.app.presentation.main.MainViewModelFactory
 import com.example.compassapplication.core.data.LocationSource
 import com.example.compassapplication.core.data.SensorInterpreter
 import com.example.compassapplication.core.data.SensorSource

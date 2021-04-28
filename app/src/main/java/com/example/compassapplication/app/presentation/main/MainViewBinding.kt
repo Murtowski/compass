@@ -1,6 +1,5 @@
-package com.example.compassapplication.app.presentation.utils
+package com.example.compassapplication.app.presentation.main
 
-import android.location.Location
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
@@ -9,7 +8,7 @@ import androidx.databinding.BindingAdapter
 import androidx.databinding.InverseBindingAdapter
 import com.example.compassapplication.core.domain.DomainLocation
 
-object CustomViewBinding {
+object MainViewBinding {
 
     @BindingAdapter("animatedRotation")
     @JvmStatic
