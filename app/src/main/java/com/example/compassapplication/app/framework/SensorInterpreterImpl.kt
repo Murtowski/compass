@@ -25,19 +25,19 @@ class SensorInterpreterImpl : SensorInterpreter {
     )
 
     private fun calculateBearingAngle(
-        lat1: Double,
-        lon1: Double,
-        lat2: Double,
-        lon2: Double
+        lat1: Float,
+        lon1: Float,
+        lat2: Float,
+        lon2: Float
     ): Float {
-        val Phi1 = Math.toRadians(lat1)
-        val Phi2 = Math.toRadians(lat2)
-        val DeltaLambda = Math.toRadians(lon2 - lon1)
-        val Theta: Double = atan2(
-            sin(DeltaLambda) * cos(Phi2),
-            cos(Phi1) * sin(Phi2) - sin(Phi1) * cos(Phi2) * cos(DeltaLambda)
+        val phi1 = Math.toRadians(lat1.toDouble())
+        val phi2 = Math.toRadians(lat2.toDouble())
+        val deltaLambda = Math.toRadians((lon2 - lon1).toDouble())
+        val theta: Double = atan2(
+            sin(deltaLambda) * cos(phi2),
+            cos(phi1) * sin(phi2) - sin(phi1) * cos(phi2) * cos(deltaLambda)
         )
-        return Math.toDegrees(Theta).toFloat()
+        return Math.toDegrees(theta).toFloat()
     }
 
     override fun calculateNorthAngle(data: SensorSample, locationAngle: Float): Float? {

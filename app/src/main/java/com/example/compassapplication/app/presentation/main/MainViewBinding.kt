@@ -33,7 +33,7 @@ object MainViewBinding {
 
     @BindingAdapter("android:text")
     @JvmStatic
-    fun TextView.setText(value: Double?) {
+    fun TextView.setText(value: Float?) {
         when (value) {
             null,
             this.getTextString() -> Unit // Non-op
@@ -43,8 +43,8 @@ object MainViewBinding {
 
     @InverseBindingAdapter(attribute = "android:text", event = "android:textAttrChanged")
     @JvmStatic
-    fun TextView.getTextString(): Double? = try {
-        this.text.toString().toDouble()
+    fun TextView.getTextString(): Float? = try {
+        this.text.toString().toFloat()
     } catch (e: NumberFormatException) {
         null
     }
@@ -66,8 +66,8 @@ object MainViewBinding {
 
     @BindingAdapter("visible")
     @JvmStatic
-    fun View.visible(visibile: Boolean) {
-        visibility = if (visibile) {
+    fun View.visible(visible: Boolean) {
+        visibility = if (visible) {
             View.VISIBLE
         } else {
             View.INVISIBLE

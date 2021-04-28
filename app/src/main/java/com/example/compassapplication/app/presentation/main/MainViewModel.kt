@@ -38,7 +38,7 @@ class MainViewModel(
     /*
     * LONGITUDE
     * */
-    val longitude = MutableLiveData(0.0)
+    val longitude = MutableLiveData<Float>()
     val longitudeError: LiveData<InputError> = longitude.map {
         when (it) {
             null -> InputError.INVALID_FORMAT
@@ -53,7 +53,7 @@ class MainViewModel(
     /*
     * LATITUDE
     * */
-    val latitude = MutableLiveData(0.0)
+    val latitude = MutableLiveData<Float>()
     val latitudeError: LiveData<InputError> = latitude.map {
         when (it) {
             null -> InputError.INVALID_FORMAT
@@ -66,7 +66,7 @@ class MainViewModel(
     /*
     * Update DESTINATION based on chosen LATITUDE & LONGITUDE updates
     * */
-    private val destinationMediatorLiveData = MediatorLiveData<Pair<Double, Double>>().apply {
+    private val destinationMediatorLiveData = MediatorLiveData<Pair<Float, Float>>().apply {
         addSource(latitude) { createNewDestinationFromLatLng() }
         addSource(longitude) { createNewDestinationFromLatLng() }
     }
@@ -83,8 +83,8 @@ class MainViewModel(
         destinationMediatorLiveData.value = destination.location
         _isCustomAzimuthSet.postValue(true)
         if (destination !is DestinationLocation.Custom) {
-            latitude.value = destination.location.first
-            longitude.value = destination.location.second
+            latitude.value = destination.location.first!!
+            longitude.value = destination.location.second!!
         }
     }
 
@@ -172,15 +172,15 @@ class MainViewModel(
         const val DEBOUNCE_TIME_MILLIS = 1000L
     }
 
-    sealed class DestinationLocation(val location: Pair<Double, Double>) {
-        object Wroclaw : DestinationLocation(Pair(51.107883, 17.038538))
-        object MountEverest : DestinationLocation(Pair(27.986065, 86.922623))
-        object Prague : DestinationLocation(Pair(50.073658, 14.418540))
-        object LosAngeles : DestinationLocation(Pair(34.052235, -118.243683))
-        class Custom(lat: Double, lng: Double) : DestinationLocation(Pair(lat, lng))
+    sealed class DestinationLocation(val location: Pair<Float, Float>) {
+        object Wroclaw : DestinationLocation(Pair(51.107883f, 17.038538f))
+        object MountEverest : DestinationLocation(Pair(27.986065f, 86.922623f))
+        object Prague : DestinationLocation(Pair(50.073658f, 14.418540f))
+        object LosAngeles : DestinationLocation(Pair(34.052235f, -118.243683f))
+        class Custom(lat: Float, lng: Float) : DestinationLocation(Pair(lat, lng))
 
         companion object {
-            fun of(lat: Double?, lng: Double?): Custom? =
+            fun of(lat: Float?, lng: Float?): Custom? =
                 if (lat != null && lng != null) Custom(lat, lng)
                 else null
         }

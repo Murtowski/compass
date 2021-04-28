@@ -5,10 +5,10 @@ import com.example.compassapplication.core.domain.DomainLocation
 
 object DataConverter {
 
-    fun Location.toDomain() = DomainLocation(this.latitude, this.longitude)
+    fun Location.toDomain() = DomainLocation(this.latitude.toFloat(), this.longitude.toFloat())
 
     fun DomainLocation.toAndroidLocation() = Location("").apply {
-        latitude = lat
-        longitude = lng
+        latitude = lat.toDouble()
+        longitude = lng.toDouble()
     }
 }

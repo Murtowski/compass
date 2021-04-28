@@ -1,6 +1,7 @@
 package com.example.compassapplication.app.presentation.main
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -25,10 +26,10 @@ class MainActivity : AppCompatActivity() {
             R.layout.activity_main
         )
         binding.lifecycleOwner = this
-
         binding.viewModel = viewModel
 
         requestPermission()
+        listenLocationChanges()
     }
 
     private fun requestPermission() {
@@ -57,6 +58,12 @@ class MainActivity : AppCompatActivity() {
         when (requestCode) {
             REQUEST_CODE_LOCATION -> requestPermission()
             else -> super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        }
+    }
+
+    private fun listenLocationChanges() {
+        viewModel.currentLocation.observe(this) {
+            Toast.makeText(this, "Custom destination Unlocked!", Toast.LENGTH_LONG).show()
         }
     }
 
