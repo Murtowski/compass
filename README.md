@@ -19,6 +19,6 @@ Application support Android from Lolipop 5.0 to current version
 - coroutines, flow (async)
 - koin (di)
 - lifecycle components (livedata, viewmodel)
-- androidX (view)
+- androidX and view data-binding (view)
 - android play services (localization)
 - mockk (testing)
