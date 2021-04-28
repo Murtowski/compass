@@ -1,10 +1,12 @@
 package com.example.compassapplication
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.compassapplication.app.presentation.InputError
-import com.example.compassapplication.app.presentation.MainViewModel
-import com.example.compassapplication.core.domain.Azimuth
+import com.example.compassapplication.app.presentation.common.InputError
+import com.example.compassapplication.app.presentation.main.MainViewModel
+import com.example.compassapplication.core.data.SensorInterpreter
 import com.example.compassapplication.core.domain.DomainLocation
+import com.example.compassapplication.core.domain.SensorSample
+import com.example.compassapplication.core.domain.SensorType
 import com.example.compassapplication.core.usecases.LocationUsecase
 import com.example.compassapplication.core.usecases.SensorUsecase
 import com.example.compassapplication.util.MainCoroutineRule
@@ -15,6 +17,7 @@ import io.mockk.mockk
 import io.mockk.spyk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -31,34 +34,28 @@ class MainViewModelTest {
 
     private lateinit var viewModel: MainViewModel
 
-    private val azimuthValues = (1..10).map { Azimuth(it.toFloat()) }
-
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
 
         val sensorUsecase = spyk<SensorUsecase>()
         every { sensorUsecase.getAndListenSensor() } returns flow {
-            for (azimuth in azimuthValues) {
-                emit(azimuth)
+            for (i in 1..10) {
+                emit(floatArrayOf(i.toFloat()))
             }
-        }
+        }.map { SensorSample(it, SensorType.ACCELEROMETER) }
 
         val locationUsecase = mockk<LocationUsecase>()
         every { locationUsecase.getAndListenLocation() } returns flow {
-            emit(
-                DomainLocation(
-                    0.0,
-                    0.0
-                )
-            )
+            emit(DomainLocation(0f, 0f))
         }
 
-        viewModel =
-            MainViewModel(
-                sensorUsecase,
-                locationUsecase
-            )
+        val sensorInterpreter = mockk<SensorInterpreter> {
+            every { calculateNorthAngle(any(), any()) } returns 0f
+            every { calculateLocationAngle(any(), any()) } returns 0f
+        }
+
+        viewModel = MainViewModel(sensorUsecase, sensorInterpreter, locationUsecase)
     }
 
     @Test
@@ -68,10 +65,10 @@ class MainViewModelTest {
         assert(viewModel.latitudeError.getOrAwaitValue() == InputError.INVALID_FORMAT)
         assert(viewModel.isLatitudeValid.getOrAwaitValue() == false)
 
-        viewModel.latitude.value = -99.0
+        viewModel.latitude.value = -99f
         assert(viewModel.isLatitudeValid.getOrAwaitValue() == false)
 
-        viewModel.latitude.value = 0.0
+        viewModel.latitude.value = 0f
         assert(viewModel.isLatitudeValid.getOrAwaitValue() == true)
         assert(viewModel.latitude.getOrAwaitValue() != null)
     }
@@ -81,7 +78,7 @@ class MainViewModelTest {
         viewModel.longitude.value = null
         assert(viewModel.isLongitudeValid.getOrAwaitValue() == false)
 
-        viewModel.longitude.value = 0.0
+        viewModel.longitude.value = 0f
 
         assert(viewModel.isLongitudeValid.getOrAwaitValue() == true)
         assert(viewModel.longitude.getOrAwaitValue() != null)
@@ -105,7 +102,9 @@ class MainViewModelTest {
         `test lat validation`()
         `test lng validation`()
 
-        viewModel.updateDestination()
+        viewModel.azimuth.getOrAwaitValue()
+
+        viewModel.setLosAngeles()
 
         assert(viewModel.isCustomAzimuthSet.getOrAwaitValue() == true) {
             println("latValid: ${viewModel.isLatitudeValid.getOrAwaitValue()}")
