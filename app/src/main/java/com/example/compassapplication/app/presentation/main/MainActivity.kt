@@ -6,8 +6,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import com.example.compassapplication.R
 import com.example.compassapplication.app.presentation.utils.PermissionUtil
+import com.example.compassapplication.core.domain.DomainLocation
 import com.example.compassapplication.databinding.ActivityMainBinding
 import org.koin.android.ext.android.inject
 import timber.log.Timber
@@ -62,9 +64,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun listenLocationChanges() {
-        viewModel.currentLocation.observe(this) {
-            Toast.makeText(this, "Custom destination Unlocked!", Toast.LENGTH_LONG).show()
+        val locationUnlockObserver = object : Observer<DomainLocation> {
+            override fun onChanged(t: DomainLocation?) {
+                if (t != null) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Custom destination Unlocked!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    viewModel.currentLocation.removeObserver(this)
+                }
+            }
         }
+        viewModel.currentLocation.observe(this, locationUnlockObserver)
     }
 
     companion object {

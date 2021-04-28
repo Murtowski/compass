@@ -7,6 +7,7 @@ import com.example.compassapplication.core.domain.DomainLocation
 import com.example.compassapplication.core.usecases.LocationUsecase
 import com.example.compassapplication.core.usecases.SensorUsecase
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -144,7 +145,8 @@ class MainViewModel(
             sensorUsecase.getAndListenSensor()
         ) { locationAngle, sensorData ->
             sensorInterpreter.calculateNorthAngle(sensorData, locationAngle)
-        }.filterNotNull()
+        }.flowOn(Dispatchers.Default)
+            .filterNotNull()
             .collect { newAzimuth ->
                 val rotation = Pair(previousAzimuth, newAzimuth)
                 previousAzimuth = newAzimuth
