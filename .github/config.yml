@@ -1,3 +1,11 @@
-COMMIT_MESSAGE_REGEX: <[A-Z]{2,6}-[0-9]{2,6} .*>
+COMMIT_MESSAGE_REGEX: /[A-Z]{2,6}-[0-9]{2,6} [\s\S]*/i
 VALID_COMMIT_MESSAGE: Success, Commit messages are valid
 INVALID_COMMIT_MESSAGE: Error, Commit messages are invalid
+
+PR_TITLE_REGEX: /[\s\S]*/i
+OUTPUT_TITLE_FAIL: qw Message validation failed!!!
+OUTPUT_TITLE_SUCCESS: 34 Message validation passed!!!
+SINGLE_OTHER_INVALID_MESSAGE: 34 other message is invalid
+MULTIPLE_OTHER_INVALID_MESSAGE: 5hother messages are invalid
+VALID_PULL_REQUEST_MESSAGE: bgPull request title is valid
+INVALID_PULL_REQUEST_MESSAGE: iu Pull request title is invalid
