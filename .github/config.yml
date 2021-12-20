@@ -1,4 +1,4 @@
-COMMIT_MESSAGE_REGEX: /[A-Z]{2,6}-[0-9]{2,6} [\s\S]*/i
+COMMIT_MESSAGE_REGEX: /[A-Z]{2,6}-[0-9]{2,6} [\s\S]*
 VALID_COMMIT_MESSAGE: Commit messages are OK!
 INVALID_COMMIT_MESSAGE: Error, commit message/s below doesn't match regex /[A-Z]{2,6}-[0-9]{2,6} [\s\S]*/i
 
