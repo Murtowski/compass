@@ -2,7 +2,7 @@
 OUTPUT_TITLE_FAIL: Commits messages don't match required regex (e.g. LNG-123 Implement toolbar)
 OUTPUT_TITLE_SUCCESS: All good, commits messages are correct ;)
 
-COMMIT_MESSAGE_REGEX: /[QWERTYUIOPASDFGHJKLZXCVBNM]{2,6}-[0-9]{2,6} [\s\S]{10,}/i
+COMMIT_MESSAGE_REGEX: /[QWERTYUIOPASDFGHJKLZXCVBNM]{2,6}-[0-9]{2,6} [\s\S]{10,}/?i
 VALID_COMMIT_MESSAGE: Commits messages are correct!
 INVALID_COMMIT_MESSAGE: Invalid commit message, it must start with ticket number (LNG-123) and description length must be at last 10 letters, e.g. LNG-123 Implement toolbar (/[A-Z]{2,6}-[0-9]{2,6} [\s\S]{10,})
 
