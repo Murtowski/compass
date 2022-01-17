@@ -1,10 +1,14 @@
 # Configuration file for CommitMessageLint
+
+# Known bug: PR's with over 30 commits causes Commit Message Lint to hang in "expected" state
+# https://github.com/SystangoTechnologies/commit-message-lint/issues/28
+
 OUTPUT_TITLE_FAIL: Commits messages don't match required regex (e.g. LNG-123 Implement toolbar)
 OUTPUT_TITLE_SUCCESS: All good, commits messages are correct ;)
 
 COMMIT_MESSAGE_REGEX: /([A-Z]{2,6}-[0-9]{2,7}|Merge) [\s\S]{10,}/
 VALID_COMMIT_MESSAGE: Commits messages are correct!
-INVALID_COMMIT_MESSAGE: Invalid commit message, it must start with ticket number (LNG-123) and description length must be at last 10 letters, e.g. LNG-123 Implement toolbar (/[A-Z]{2,6}-[0-9]{2,6} [\s\S]{10,})
+INVALID_COMMIT_MESSAGE: ReInvalid commit message, it must start with ticket number (LNG-123) or with word `Merge` and its description length must be at last 10 letters, e.g. LNG-123 Implement toolbar. Regex is configured inside .github/config.yml file
 
 PR_TITLE_REGEX: /[\s\S]*/i
 VALID_PULL_REQUEST_MESSAGE: Pull request title is OK (by default accepts any string)

@@ -1,6 +1,6 @@
 # Compass Application
 
-Simple Android Application that shows four cardinal directions of the world (**left image**)!!
+Simple Android Application that shows four cardinal directions of the world (**left image**)!
 
 As a user You can also indicate Your own direction to which the azimuth will point. You can do that by typing Your own coordinates (**right image**) or You can select one of the predefined destination, like: `Wroclaw` or `Los Angeles`.
 
